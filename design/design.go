@@ -23,7 +23,7 @@ var Book = Type("Book", func() {
 }) //ToBeModified
 
 var _ = Service("books", func() {
-	Description("API for Users")
+	Description("API for Books")
 
 	Method("create", func() {
 		Payload(Book)
