@@ -1,0 +1,222 @@
+openapi: 3.0.3
+info:
+    title: Books Service
+    description: CRUD Application for books
+    version: "1.0"
+servers:
+    - url: http://localhost:8000
+paths:
+    /books:
+        get:
+            tags:
+                - books
+            summary: all books
+            operationId: books#all
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/CreateRequestBody'
+                                example:
+                                    - author: Mollitia assumenda explicabo impedit nesciunt.
+                                      bookCover: Aut eligendi repudiandae repellat.
+                                      id: 4716645499305038111
+                                      publishedAt: Qui ut et quo est omnis dolor.
+                                      title: Ut rerum aliquid.
+                                    - author: Mollitia assumenda explicabo impedit nesciunt.
+                                      bookCover: Aut eligendi repudiandae repellat.
+                                      id: 4716645499305038111
+                                      publishedAt: Qui ut et quo est omnis dolor.
+                                      title: Ut rerum aliquid.
+                            example:
+                                - author: Mollitia assumenda explicabo impedit nesciunt.
+                                  bookCover: Aut eligendi repudiandae repellat.
+                                  id: 4716645499305038111
+                                  publishedAt: Qui ut et quo est omnis dolor.
+                                  title: Ut rerum aliquid.
+                                - author: Mollitia assumenda explicabo impedit nesciunt.
+                                  bookCover: Aut eligendi repudiandae repellat.
+                                  id: 4716645499305038111
+                                  publishedAt: Qui ut et quo est omnis dolor.
+                                  title: Ut rerum aliquid.
+        post:
+            tags:
+                - books
+            summary: create books
+            operationId: books#create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateRequestBody'
+                        example:
+                            author: Sunt ut sint accusamus.
+                            bookCover: Omnis molestiae sed.
+                            id: 4527815212959476002
+                            publishedAt: In optio dolor sed quo porro.
+                            title: Ipsam sed.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateRequestBody'
+                            example:
+                                author: In velit quaerat quaerat voluptatibus quod aspernatur.
+                                bookCover: Enim inventore voluptas et optio modi.
+                                id: 6964725707681953743
+                                publishedAt: Quisquam unde sed ut aperiam magni aut.
+                                title: Magni laborum non.
+    /books/{id}:
+        delete:
+            tags:
+                - books
+            summary: deleteBook books
+            operationId: books#deleteBook
+            parameters:
+                - name: id
+                  in: path
+                  description: Book ID
+                  required: true
+                  schema:
+                    type: integer
+                    description: Book ID
+                    example: 8401032869637148523
+                    format: int64
+                  example: 7336466431814026404
+            responses:
+                "204":
+                    description: No Content response.
+        get:
+            tags:
+                - books
+            summary: getBook books
+            operationId: books#getBook
+            parameters:
+                - name: id
+                  in: path
+                  description: Book ID
+                  required: true
+                  schema:
+                    type: integer
+                    description: Book ID
+                    example: 5088798499266199857
+                    format: int64
+                  example: 5958733691908977449
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateRequestBody'
+                            example:
+                                author: Sapiente nesciunt.
+                                bookCover: Repellendus rerum quia fuga eum.
+                                id: 3735215273704578636
+                                publishedAt: Perferendis consequuntur sint ut ut et quis.
+                                title: Omnis in rem non assumenda.
+        put:
+            tags:
+                - books
+            summary: updateBook books
+            operationId: books#updateBook
+            parameters:
+                - name: id
+                  in: path
+                  description: Book ID
+                  required: true
+                  schema:
+                    type: integer
+                    description: Book ID
+                    example: 3492697522237773608
+                    format: int64
+                  example: 5838317197026300858
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateBookRequestBody'
+                        example:
+                            book:
+                                author: Eum maiores maxime.
+                                bookCover: Non dolores quasi saepe sunt est dolor.
+                                id: 4940795916846100831
+                                publishedAt: Expedita commodi facere magni et.
+                                title: Eos consequuntur tempore.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateRequestBody'
+                            example:
+                                author: Exercitationem exercitationem.
+                                bookCover: Harum eaque cum quia eos repellendus itaque.
+                                id: 2801858497930049972
+                                publishedAt: Quam rerum enim quibusdam.
+                                title: Rerum et dolor labore quia.
+    /openapi3.json:
+        get:
+            tags:
+                - books
+            summary: Download ./gen/http/openapi3.json
+            operationId: books#/openapi3.json
+            responses:
+                "200":
+                    description: File downloaded
+components:
+    schemas:
+        CreateRequestBody:
+            type: object
+            properties:
+                author:
+                    type: string
+                    description: Author of the book
+                    example: Consequatur totam culpa.
+                bookCover:
+                    type: string
+                    description: Cover of the book
+                    example: Culpa in qui.
+                id:
+                    type: integer
+                    description: Unique ID of the book
+                    example: 3053542106201439437
+                    format: int64
+                publishedAt:
+                    type: string
+                    description: Date the book has been published
+                    example: Officia exercitationem.
+                title:
+                    type: string
+                    description: Title of the book
+                    example: Occaecati eaque nulla consequuntur delectus atque.
+            example:
+                author: Aperiam veritatis.
+                bookCover: Porro natus quos.
+                id: 5363652407402971893
+                publishedAt: Sit ipsam.
+                title: Eos quia.
+        UpdateBookRequestBody:
+            type: object
+            properties:
+                book:
+                    $ref: '#/components/schemas/CreateRequestBody'
+            example:
+                book:
+                    author: Eum maiores maxime.
+                    bookCover: Non dolores quasi saepe sunt est dolor.
+                    id: 4940795916846100831
+                    publishedAt: Expedita commodi facere magni et.
+                    title: Eos consequuntur tempore.
+tags:
+    - name: books
+      description: API for Users
