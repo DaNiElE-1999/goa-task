@@ -10,48 +10,33 @@ var _ = API("books", func() {
 	Server("books", func() {
 		Host("localhost", func() {
 			URI("http://localhost:8000")
-			URI("grpc://localhost:8080")
 		})
 	})
 })
 
+var Book = Type("Book", func() {
+	Attribute("id", Int, "Unique ID of the book")
+	Attribute("title", String, "Title of the book")
+	Attribute("author", String, "Author of the book")
+	Attribute("bookCover", String, "Cover of the book")
+	Attribute("publishedAt", String, "Date the book has been published")
+}) //ToBeModified
+
 var _ = Service("books", func() {
-	Description("The books service performs CRUD operations.")
-	//
-	HTTP(func() {
-		Path("/library")
-		Error("not_found", StatusNotFound, "Resource not found")
-	})
+	Description("API for Users")
 
-	Method("listBooks", func() {
-		Result(CollectionOf(Book))
-		HTTP(func() {
-			GET("/books")
-		})
-		GRPC(func() {
-		})
-	})
-
-	Method("getBook", func() {
-		Payload(func() {
-			Field(1, "id", Int, "Book ID")
-		})
-		Result(Book)
-		HTTP(func() {
-			GET("/books/{id}")
-			Response("not_found", StatusNotFound)
-		})
-		GRPC(func() {
-		})
-	})
-
-	Method("createBook", func() {
+	Method("create", func() {
 		Payload(Book)
 		Result(Book)
 		HTTP(func() {
 			POST("/books")
 		})
-		GRPC(func() {
+	})
+
+	Method("all", func() {
+		Result(ArrayOf(Book))
+		HTTP(func() {
+			GET("/books")
 		})
 	})
 
@@ -64,7 +49,15 @@ var _ = Service("books", func() {
 		HTTP(func() {
 			PUT("/books/{id}")
 		})
-		GRPC(func() {
+	})
+
+	Method("getBook", func() {
+		Payload(func() {
+			Field(1, "id", Int, "Book ID")
+		})
+		Result(Book)
+		HTTP(func() {
+			GET("/books/{id}")
 		})
 	})
 
@@ -75,9 +68,7 @@ var _ = Service("books", func() {
 		HTTP(func() {
 			DELETE("/books/{id}")
 		})
-		GRPC(func() {
-		})
 	})
-	//
-	Files("/openapi.json", "./gen/http/openapi.json")
-})
+
+	Files("/openapi3.json", "./gen/http/openapi3.json")
+}) //error handling to be implemented
