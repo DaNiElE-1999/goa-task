@@ -16,27 +16,6 @@ type bookssrvc struct {
 	logger *log.Logger
 }
 
-// func ExecuteQuery(query string) {
-// 	godotenv.Load(".env")
-
-// 	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3333)/books") //toBeFixed with env var
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer db.Close()
-
-// 	// Open doesn't open a connection. Validate DSN data:
-// 	err = db.Ping()
-// 	if err != nil {
-// 		panic(err.Error()) // proper error handling instead of panic in your app
-// 	}
-
-// 	db.Query(query)
-
-// 	db.Close()
-
-// }
-
 // NewBooks returns the books service implementation.
 func NewBooks(logger *log.Logger) books.Service {
 	return &bookssrvc{logger}
@@ -45,11 +24,6 @@ func NewBooks(logger *log.Logger) books.Service {
 // Create implements create.
 func (s *bookssrvc) Create(ctx context.Context, p *books.Book) (res *books.Book, err error) {
 	s.logger.Print("books.create")
-	s.logger.Print("Received POST request with the following data:")
-	s.logger.Printf("Title: %s", *p.Title)
-	s.logger.Printf("Author: %s", *p.Author)
-	s.logger.Printf("BookCover: %s", *p.BookCover)
-	s.logger.Printf("PublishedAt: %s", *p.PublishedAt)
 
 	// Execute the SQL query to insert a new book
 	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3333)/books") // Replace with your database connection details
@@ -118,28 +92,25 @@ func (s *bookssrvc) All(ctx context.Context) (res []*books.Book, err error) {
 func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (res *books.Book, err error) {
 	s.logger.Print("books.updateBook")
 
-	// Execute the SQL query to update the book
-	// db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3333)/books") // Replace with your database connection details
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer db.Close()
+	//Execute the SQL query to update the book
+	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3333)/books") // Replace with your database connection details
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
 
-	// s.logger.Print(p.Book.Title, p.Book.Author, p.Book.BookCover, p.Book.PublishedAt, p.ID)
-	// s.logger.Print(*p.Book.Title, *p.Book.Author, *p.Book.BookCover, *p.Book.PublishedAt, *p.ID)
+	//Create the SQL query for updating a book
+	updateQuery := "UPDATE books SET Title = ?, Author = ?, BookCover = ?, PublishedAt = ? WHERE Id = ?"
 
-	// Create the SQL query for updating a book
-	// updateQuery := "UPDATE books SET Title = ?, Author = ?, BookCover = ?, PublishedAt = ? WHERE Id = ?"
+	//Execute the query
+	_, err = db.Exec(updateQuery, p.Book.Title, p.Book.Author, p.Book.BookCover, p.Book.PublishedAt, p.ID)
+	if err != nil {
+		return nil, err
+	}
 
-	// Execute the query
-	// _, err = db.Exec(updateQuery, p.Book.Title, p.Book.Author, p.Book.BookCover, p.Book.PublishedAt, p.ID)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// Return the updated book
-	// return p.Book, nil
-	return
+	//Return the updated book
+	return p.Book, nil
+	//return
 }
 
 // GetBook implements getBook.
