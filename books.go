@@ -5,8 +5,10 @@ import (
 	context "context"
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 type bookssrvc struct {
@@ -17,7 +19,14 @@ type bookssrvc struct {
 // NewBooks returns the books service implementation.
 func NewBooks(logger *log.Logger) books.Service {
 	// Create a database connection.
-	db, err := sql.Open("mysql", "root@tcp(127.0.0.1:3333)/books") // Replace with your database connection details
+	godotenv.Load(".env")
+
+	connectionString := os.Getenv("Connection_String")
+	if connectionString == "" {
+		log.Fatal("Connection string not found")
+	}
+
+	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
 		log.Fatal(err)
 	}
