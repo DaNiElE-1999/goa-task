@@ -4,13 +4,26 @@ import (
 	books "books/gen/books"
 	context "context"
 	"database/sql"
+	"errors"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
+
+// Date format regular expression
+var dateFormatRegexp = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
+
+// Custom error for invalid date format
+var ErrInvalidDateFormat = errors.New("Invalid date format. Date should be in 'yyyy-mm-dd' format")
+
+// Validate date format
+func isValidDateFormat(date string) bool {
+	return dateFormatRegexp.MatchString(date)
+}
 
 type bookssrvc struct {
 	logger *log.Logger
@@ -53,6 +66,11 @@ func (s *bookssrvc) executeQuery(query string, args ...interface{}) error {
 // Create implements create.
 func (s *bookssrvc) Create(ctx context.Context, p *books.Book) (res *books.Book, err error) {
 	s.logger.Print("books.create")
+
+	// Validate the date format
+	if p.PublishedAt != nil && !isValidDateFormat(*p.PublishedAt) {
+		return nil, ErrInvalidDateFormat
+	}
 
 	// Create the SQL query for inserting a new book
 	insertQuery := "INSERT INTO books (Title, Author, BookCover, PublishedAt) VALUES (?, ?, ?, ?)"
@@ -100,6 +118,11 @@ func (s *bookssrvc) All(ctx context.Context) (res []*books.Book, err error) {
 
 func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (res *books.Book, err error) {
 	s.logger.Print("books.updateBook")
+
+	// Validate the date format
+	if p.Book.PublishedAt != nil && !isValidDateFormat(*p.Book.PublishedAt) {
+		return nil, ErrInvalidDateFormat
+	}
 
 	// Initialize a list to store the SET clauses for the SQL query
 	var setClauses []string
