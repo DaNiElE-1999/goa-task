@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -97,15 +98,47 @@ func (s *bookssrvc) All(ctx context.Context) (res []*books.Book, err error) {
 	return booksList, nil
 }
 
-// UpdateBook implements updateBook.
 func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (res *books.Book, err error) {
 	s.logger.Print("books.updateBook")
 
-	// Create the SQL query for updating a book
-	updateQuery := "UPDATE books SET Title = ?, Author = ?, BookCover = ?, PublishedAt = ? WHERE Id = ?"
+	// Initialize a list to store the SET clauses for the SQL query
+	var setClauses []string
+
+	// Initialize a list to store the arguments for the SQL query
+	var args []interface{}
+
+	// Check if the payload contains a title update
+	if p.Book.Title != nil {
+		setClauses = append(setClauses, "Title = ?")
+		args = append(args, *p.Book.Title)
+	}
+
+	// Check if the payload contains an author update
+	if p.Book.Author != nil {
+		setClauses = append(setClauses, "Author = ?")
+		args = append(args, *p.Book.Author)
+	}
+
+	// Check if the payload contains a bookCover update
+	if p.Book.BookCover != nil {
+		setClauses = append(setClauses, "BookCover = ?")
+		args = append(args, *p.Book.BookCover)
+	}
+
+	// Check if the payload contains a publishedAt update
+	if p.Book.PublishedAt != nil {
+		setClauses = append(setClauses, "PublishedAt = ?")
+		args = append(args, *p.Book.PublishedAt)
+	}
+
+	// Add the ID for the WHERE clause
+	args = append(args, p.ID)
+
+	// Create the SQL query with the SET clauses
+	updateQuery := "UPDATE books SET " + strings.Join(setClauses, ", ") + " WHERE Id = ?"
 
 	// Execute the query using the reusable function
-	if err := s.executeQuery(updateQuery, p.Book.Title, p.Book.Author, p.Book.BookCover, p.Book.PublishedAt, p.ID); err != nil {
+	if err := s.executeQuery(updateQuery, args...); err != nil {
 		return nil, err
 	}
 
