@@ -15,18 +15,16 @@ var _ = API("books", func() {
 })
 
 var Book = Type("Book", func() {
-	Attribute("title", String, "Title of the book", func() {
-		Required()
-	})
-	Attribute("author", String, "Author of the book", func() {
-		Required()
-	})
-	Attribute("bookCover", String, "Cover of the book", func() {
-		Required()
-	})
-	Attribute("publishedAt", String, "Date the book has been published", func() {
-		Required()
-	})
+	Attribute("title", String, "Title of the book")
+	Attribute("author", String, "Author of the book")
+	Attribute("bookCover", String, "Cover of the book")
+	Attribute("publishedAt", String, "Date the book has been published")
+	Required("title", "author", "bookCover", "publishedAt")
+})
+
+var BookCover = Type("BookCover", func() {
+	Attribute("bookTitle", String, "Title of the book")
+	Attribute("imagePath", String, "Path to the image in storage")
 })
 
 var _ = Service("books", func() {
