@@ -20,66 +20,34 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    $ref: '#/components/schemas/Book'
+                                    $ref: '#/components/schemas/CreateRequestBody'
                                 example:
-                                    - ID: 989268852422319511
-                                      author: Enim inventore voluptas et optio modi.
-                                      bookCover: multipart/form-data; boundary=goa
-                                      publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                      title: In velit quaerat quaerat voluptatibus quod aspernatur.
-                                    - ID: 989268852422319511
-                                      author: Enim inventore voluptas et optio modi.
-                                      bookCover: multipart/form-data; boundary=goa
-                                      publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                      title: In velit quaerat quaerat voluptatibus quod aspernatur.
-                                    - ID: 989268852422319511
-                                      author: Enim inventore voluptas et optio modi.
-                                      bookCover: multipart/form-data; boundary=goa
-                                      publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                      title: In velit quaerat quaerat voluptatibus quod aspernatur.
-                                    - ID: 989268852422319511
-                                      author: Enim inventore voluptas et optio modi.
-                                      bookCover: multipart/form-data; boundary=goa
-                                      publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                      title: In velit quaerat quaerat voluptatibus quod aspernatur.
+                                    - author: Mollitia assumenda explicabo impedit nesciunt.
+                                      bookCover: Aut eligendi repudiandae repellat.
+                                      id: 4716645499305038111
+                                      publishedAt: Qui ut et quo est omnis dolor.
+                                      title: Ut rerum aliquid.
+                                    - author: Mollitia assumenda explicabo impedit nesciunt.
+                                      bookCover: Aut eligendi repudiandae repellat.
+                                      id: 4716645499305038111
+                                      publishedAt: Qui ut et quo est omnis dolor.
+                                      title: Ut rerum aliquid.
                             example:
-                                - ID: 989268852422319511
-                                  author: Enim inventore voluptas et optio modi.
-                                  bookCover: multipart/form-data; boundary=goa
-                                  publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                  title: In velit quaerat quaerat voluptatibus quod aspernatur.
-                                - ID: 989268852422319511
-                                  author: Enim inventore voluptas et optio modi.
-                                  bookCover: multipart/form-data; boundary=goa
-                                  publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                  title: In velit quaerat quaerat voluptatibus quod aspernatur.
-                                - ID: 989268852422319511
-                                  author: Enim inventore voluptas et optio modi.
-                                  bookCover: multipart/form-data; boundary=goa
-                                  publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                  title: In velit quaerat quaerat voluptatibus quod aspernatur.
-                                - ID: 989268852422319511
-                                  author: Enim inventore voluptas et optio modi.
-                                  bookCover: multipart/form-data; boundary=goa
-                                  publishedAt: Quisquam unde sed ut aperiam magni aut.
-                                  title: In velit quaerat quaerat voluptatibus quod aspernatur.
+                                - author: Mollitia assumenda explicabo impedit nesciunt.
+                                  bookCover: Aut eligendi repudiandae repellat.
+                                  id: 4716645499305038111
+                                  publishedAt: Qui ut et quo est omnis dolor.
+                                  title: Ut rerum aliquid.
+                                - author: Mollitia assumenda explicabo impedit nesciunt.
+                                  bookCover: Aut eligendi repudiandae repellat.
+                                  id: 4716645499305038111
+                                  publishedAt: Qui ut et quo est omnis dolor.
+                                  title: Ut rerum aliquid.
         post:
             tags:
                 - books
             summary: create books
             operationId: books#create
-            parameters:
-                - name: Content-Type
-                  in: header
-                  description: Cover of the book
-                  allowEmptyValue: true
-                  schema:
-                    type: string
-                    description: Cover of the book
-                    default: multipart/form-data; boundary=goa
-                    example: multipart/form-data; boundary=goa
-                    pattern: multipart/[^;]+; boundary=.+
-                  example: multipart/form-data; boundary=goa
             requestBody:
                 required: true
                 content:
@@ -87,23 +55,24 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateRequestBody'
                         example:
-                            ID: 4698454743706616641
-                            author: Ipsam sed.
-                            publishedAt: Sunt ut sint accusamus.
-                            title: Et odio est.
+                            author: Sunt ut sint accusamus.
+                            bookCover: Omnis molestiae sed.
+                            id: 4527815212959476002
+                            publishedAt: In optio dolor sed quo porro.
+                            title: Ipsam sed.
             responses:
                 "200":
                     description: OK response.
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Book'
+                                $ref: '#/components/schemas/CreateRequestBody'
                             example:
-                                ID: 4458355984204493718
-                                author: In optio dolor sed quo porro.
-                                bookCover: multipart/form-data; boundary=goa
-                                publishedAt: Natus magni laborum.
-                                title: Molestiae sed.
+                                author: In velit quaerat quaerat voluptatibus quod aspernatur.
+                                bookCover: Enim inventore voluptas et optio modi.
+                                id: 6964725707681953743
+                                publishedAt: Quisquam unde sed ut aperiam magni aut.
+                                title: Magni laborum non.
     /books/{id}:
         delete:
             tags:
@@ -118,9 +87,9 @@ paths:
                   schema:
                     type: integer
                     description: Book ID
-                    example: 1588809184003176921
+                    example: 8401032869637148523
                     format: int64
-                  example: 7478570820194314328
+                  example: 7336466431814026404
             responses:
                 "204":
                     description: No Content response.
@@ -137,22 +106,22 @@ paths:
                   schema:
                     type: integer
                     description: Book ID
-                    example: 4701144735833275814
+                    example: 5088798499266199857
                     format: int64
-                  example: 3295349491679113499
+                  example: 5958733691908977449
             responses:
                 "200":
                     description: OK response.
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Book'
+                                $ref: '#/components/schemas/CreateRequestBody'
                             example:
-                                ID: 4124588484954371931
-                                author: Dolor labore.
-                                bookCover: multipart/form-data; boundary=goa
-                                publishedAt: Adipisci exercitationem exercitationem.
-                                title: Magni et veniam est quibusdam rerum.
+                                author: Sapiente nesciunt.
+                                bookCover: Repellendus rerum quia fuga eum.
+                                id: 3735215273704578636
+                                publishedAt: Perferendis consequuntur sint ut ut et quis.
+                                title: Omnis in rem non assumenda.
         put:
             tags:
                 - books
@@ -166,9 +135,9 @@ paths:
                   schema:
                     type: integer
                     description: Book ID
-                    example: 8125819523514706512
+                    example: 3492697522237773608
                     format: int64
-                  example: 8855862864020740775
+                  example: 5838317197026300858
             requestBody:
                 required: true
                 content:
@@ -177,24 +146,24 @@ paths:
                             $ref: '#/components/schemas/UpdateBookRequestBody'
                         example:
                             book:
-                                ID: 3012804354026031466
-                                author: Aut eligendi repudiandae repellat.
-                                bookCover: multipart/form-data; boundary=goa
-                                publishedAt: Qui ut et quo est omnis dolor.
-                                title: Mollitia assumenda explicabo impedit nesciunt.
+                                author: Eum maiores maxime.
+                                bookCover: Non dolores quasi saepe sunt est dolor.
+                                id: 4940795916846100831
+                                publishedAt: Expedita commodi facere magni et.
+                                title: Eos consequuntur tempore.
             responses:
                 "200":
                     description: OK response.
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Book'
+                                $ref: '#/components/schemas/CreateRequestBody'
                             example:
-                                ID: 8132135982868657749
-                                author: Maiores maxime sint non.
-                                bookCover: multipart/form-data; boundary=goa
-                                publishedAt: Quasi saepe sunt est dolor.
-                                title: Nesciunt deserunt mollitia eos consequuntur tempore et.
+                                author: Exercitationem exercitationem.
+                                bookCover: Harum eaque cum quia eos repellendus itaque.
+                                id: 2801858497930049972
+                                publishedAt: Quam rerum enim quibusdam.
+                                title: Rerum et dolor labore quia.
     /openapi3.json:
         get:
             tags:
@@ -206,84 +175,48 @@ paths:
                     description: File downloaded
 components:
     schemas:
-        Book:
-            type: object
-            properties:
-                ID:
-                    type: integer
-                    description: id
-                    example: 5021194363307788954
-                    format: int64
-                author:
-                    type: string
-                    description: Author of the book
-                    example: Incidunt dignissimos sed omnis.
-                bookCover:
-                    type: string
-                    description: Cover of the book
-                    default: multipart/form-data; boundary=goa
-                    example: multipart/form-data; boundary=goa
-                    pattern: multipart/[^;]+; boundary=.+
-                publishedAt:
-                    type: string
-                    description: Date the book has been published
-                    example: Id rem libero a sunt.
-                title:
-                    type: string
-                    description: Title of the book
-                    example: Aut qui quis distinctio labore.
-            example:
-                ID: 7244139769867850733
-                author: Corrupti saepe laudantium qui eligendi.
-                bookCover: multipart/form-data; boundary=goa
-                publishedAt: Fuga est sed blanditiis et.
-                title: Aut doloribus expedita autem quis iusto dolorem.
-            required:
-                - title
-                - author
-                - bookCover
-                - publishedAt
         CreateRequestBody:
             type: object
             properties:
-                ID:
-                    type: integer
-                    description: id
-                    example: 344107701002599794
-                    format: int64
                 author:
                     type: string
                     description: Author of the book
-                    example: Dolorum quas.
+                    example: Consequatur totam culpa.
+                bookCover:
+                    type: string
+                    description: Cover of the book
+                    example: Culpa in qui.
+                id:
+                    type: integer
+                    description: Unique ID of the book
+                    example: 3053542106201439437
+                    format: int64
                 publishedAt:
                     type: string
                     description: Date the book has been published
-                    example: Sunt odit repellendus rerum.
+                    example: Officia exercitationem.
                 title:
                     type: string
                     description: Title of the book
-                    example: Error officiis et.
+                    example: Occaecati eaque nulla consequuntur delectus atque.
             example:
-                ID: 5978078527110260316
-                author: Ratione sint voluptatibus quos praesentium.
-                publishedAt: Nihil fugit minima cupiditate consequatur non cupiditate.
-                title: Sed occaecati sequi veniam vitae omnis voluptate.
-            required:
-                - title
-                - author
-                - publishedAt
+                author: Aperiam veritatis.
+                bookCover: Porro natus quos.
+                id: 5363652407402971893
+                publishedAt: Sit ipsam.
+                title: Eos quia.
         UpdateBookRequestBody:
             type: object
             properties:
                 book:
-                    $ref: '#/components/schemas/Book'
+                    $ref: '#/components/schemas/CreateRequestBody'
             example:
                 book:
-                    ID: 3012804354026031466
-                    author: Aut eligendi repudiandae repellat.
-                    bookCover: multipart/form-data; boundary=goa
-                    publishedAt: Qui ut et quo est omnis dolor.
-                    title: Mollitia assumenda explicabo impedit nesciunt.
+                    author: Eum maiores maxime.
+                    bookCover: Non dolores quasi saepe sunt est dolor.
+                    id: 4940795916846100831
+                    publishedAt: Expedita commodi facere magni et.
+                    title: Eos consequuntur tempore.
 tags:
     - name: books
-      description: API for Books
+      description: API for Users

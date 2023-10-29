@@ -11,7 +11,7 @@ import (
 	"context"
 )
 
-// API for Books
+// API for Users
 type Service interface {
 	// Create implements create.
 	Create(context.Context, *Book) (res *Book, err error)
@@ -37,16 +37,16 @@ var MethodNames = [5]string{"create", "all", "updateBook", "getBook", "deleteBoo
 
 // Book is the payload type of the books service create method.
 type Book struct {
-	// id
+	// Unique ID of the book
 	ID *int
 	// Title of the book
-	Title string
+	Title *string
 	// Author of the book
-	Author string
+	Author *string
 	// Cover of the book
-	BookCover string
+	BookCover *string
 	// Date the book has been published
-	PublishedAt string
+	PublishedAt *string
 }
 
 // DeleteBookPayload is the payload type of the books service deleteBook method.

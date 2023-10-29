@@ -45,23 +45,7 @@ func DecodeCreateRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateCreateRequestBody(&body)
-		if err != nil {
-			return nil, err
-		}
-
-		var (
-			bookCover string
-		)
-		bookCover = r.Header.Get("Content-Type")
-		if bookCover == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("bookCover", "header"))
-		}
-		err = goa.MergeErrors(err, goa.ValidatePattern("bookCover", bookCover, "multipart/[^;]+; boundary=.+"))
-		if err != nil {
-			return nil, err
-		}
-		payload := NewCreateBook(&body, bookCover)
+		payload := NewCreateBook(&body)
 
 		return payload, nil
 	}
@@ -105,10 +89,6 @@ func DecodeUpdateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 				return nil, goa.MissingPayloadError()
 			}
 			return nil, goa.DecodePayloadError(err.Error())
-		}
-		err = ValidateUpdateBookRequestBody(&body)
-		if err != nil {
-			return nil, err
 		}
 
 		var (
@@ -230,10 +210,10 @@ func unmarshalBookRequestBodyToBooksBook(v *BookRequestBody) *books.Book {
 	}
 	res := &books.Book{
 		ID:          v.ID,
-		Title:       *v.Title,
-		Author:      *v.Author,
-		BookCover:   *v.BookCover,
-		PublishedAt: *v.PublishedAt,
+		Title:       v.Title,
+		Author:      v.Author,
+		BookCover:   v.BookCover,
+		PublishedAt: v.PublishedAt,
 	}
 
 	return res

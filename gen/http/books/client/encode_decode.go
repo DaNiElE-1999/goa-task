@@ -16,7 +16,6 @@ import (
 	"net/url"
 
 	goahttp "goa.design/goa/v3/http"
-	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildCreateRequest instantiates a HTTP request object with method and path
@@ -41,10 +40,6 @@ func EncodeCreateRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 		p, ok := v.(*books.Book)
 		if !ok {
 			return goahttp.ErrInvalidType("books", "create", "*books.Book", v)
-		}
-		{
-			head := p.BookCover
-			req.Header.Set("Content-Type", head)
 		}
 		body := NewCreateRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
@@ -80,10 +75,6 @@ func DecodeCreateResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("books", "create", err)
-			}
-			err = ValidateCreateResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("books", "create", err)
 			}
 			res := NewCreateBookOK(&body)
 			return res, nil
@@ -135,16 +126,6 @@ func DecodeAllResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("books", "all", err)
-			}
-			for _, e := range body {
-				if e != nil {
-					if err2 := ValidateBookResponse(e); err2 != nil {
-						err = goa.MergeErrors(err, err2)
-					}
-				}
-			}
-			if err != nil {
-				return nil, goahttp.ErrValidationError("books", "all", err)
 			}
 			res := NewAllBookOK(body)
 			return res, nil
@@ -225,10 +206,6 @@ func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("books", "updateBook", err)
 			}
-			err = ValidateUpdateBookResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("books", "updateBook", err)
-			}
 			res := NewUpdateBookBookOK(&body)
 			return res, nil
 		default:
@@ -291,10 +268,6 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("books", "getBook", err)
-			}
-			err = ValidateGetBookResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("books", "getBook", err)
 			}
 			res := NewGetBookBookOK(&body)
 			return res, nil
@@ -364,10 +337,10 @@ func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 func unmarshalBookResponseToBooksBook(v *BookResponse) *books.Book {
 	res := &books.Book{
 		ID:          v.ID,
-		Title:       *v.Title,
-		Author:      *v.Author,
-		BookCover:   *v.BookCover,
-		PublishedAt: *v.PublishedAt,
+		Title:       v.Title,
+		Author:      v.Author,
+		BookCover:   v.BookCover,
+		PublishedAt: v.PublishedAt,
 	}
 
 	return res

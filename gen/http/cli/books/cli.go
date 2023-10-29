@@ -29,11 +29,12 @@ func UsageCommands() string {
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` books create --body '{
-      "ID": 4698454743706616641,
-      "author": "Ipsam sed.",
-      "publishedAt": "Sunt ut sint accusamus.",
-      "title": "Et odio est."
-   }' --book-cover "multipart/form-data; boundary=goa"` + "\n" +
+      "author": "Sunt ut sint accusamus.",
+      "bookCover": "Omnis molestiae sed.",
+      "id": 4527815212959476002,
+      "publishedAt": "In optio dolor sed quo porro.",
+      "title": "Ipsam sed."
+   }'` + "\n" +
 		""
 }
 
@@ -49,9 +50,8 @@ func ParseEndpoint(
 	var (
 		booksFlags = flag.NewFlagSet("books", flag.ContinueOnError)
 
-		booksCreateFlags         = flag.NewFlagSet("create", flag.ExitOnError)
-		booksCreateBodyFlag      = booksCreateFlags.String("body", "REQUIRED", "")
-		booksCreateBookCoverFlag = booksCreateFlags.String("book-cover", "multipart/form-data; boundary=goa", "")
+		booksCreateFlags    = flag.NewFlagSet("create", flag.ExitOnError)
+		booksCreateBodyFlag = booksCreateFlags.String("body", "REQUIRED", "")
 
 		booksAllFlags = flag.NewFlagSet("all", flag.ExitOnError)
 
@@ -148,7 +148,7 @@ func ParseEndpoint(
 			switch epn {
 			case "create":
 				endpoint = c.Create()
-				data, err = booksc.BuildCreatePayload(*booksCreateBodyFlag, *booksCreateBookCoverFlag)
+				data, err = booksc.BuildCreatePayload(*booksCreateBodyFlag)
 			case "all":
 				endpoint = c.All()
 				data = nil
@@ -173,7 +173,7 @@ func ParseEndpoint(
 
 // booksUsage displays the usage of the books command and its subcommands.
 func booksUsage() {
-	fmt.Fprintf(os.Stderr, `API for Books
+	fmt.Fprintf(os.Stderr, `API for Users
 Usage:
     %[1]s [globalflags] books COMMAND [flags]
 
@@ -189,19 +189,19 @@ Additional help:
 `, os.Args[0])
 }
 func booksCreateUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] books create -body JSON -book-cover STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] books create -body JSON
 
 Create implements create.
     -body JSON: 
-    -book-cover STRING: 
 
 Example:
     %[1]s books create --body '{
-      "ID": 4698454743706616641,
-      "author": "Ipsam sed.",
-      "publishedAt": "Sunt ut sint accusamus.",
-      "title": "Et odio est."
-   }' --book-cover "multipart/form-data; boundary=goa"
+      "author": "Sunt ut sint accusamus.",
+      "bookCover": "Omnis molestiae sed.",
+      "id": 4527815212959476002,
+      "publishedAt": "In optio dolor sed quo porro.",
+      "title": "Ipsam sed."
+   }'
 `, os.Args[0])
 }
 
@@ -225,13 +225,13 @@ UpdateBook implements updateBook.
 Example:
     %[1]s books update-book --body '{
       "book": {
-         "ID": 3012804354026031466,
-         "author": "Aut eligendi repudiandae repellat.",
-         "bookCover": "multipart/form-data; boundary=goa",
-         "publishedAt": "Qui ut et quo est omnis dolor.",
-         "title": "Mollitia assumenda explicabo impedit nesciunt."
+         "author": "Eum maiores maxime.",
+         "bookCover": "Non dolores quasi saepe sunt est dolor.",
+         "id": 4940795916846100831,
+         "publishedAt": "Expedita commodi facere magni et.",
+         "title": "Eos consequuntur tempore."
       }
-   }' --id 4485231234075589164
+   }' --id 7004976670955238273
 `, os.Args[0])
 }
 
@@ -242,7 +242,7 @@ GetBook implements getBook.
     -id INT: Book ID
 
 Example:
-    %[1]s books get-book --id 9047210969149619277
+    %[1]s books get-book --id 8779549259451125819
 `, os.Args[0])
 }
 
@@ -253,6 +253,6 @@ DeleteBook implements deleteBook.
     -id INT: Book ID
 
 Example:
-    %[1]s books delete-book --id 7164475420641560117
+    %[1]s books delete-book --id 7531440421541391582
 `, os.Args[0])
 }
