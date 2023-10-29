@@ -12,26 +12,36 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildCreatePayload builds the payload for the books create endpoint from CLI
 // flags.
-func BuildCreatePayload(booksCreateBody string) (*books.Book, error) {
+func BuildCreatePayload(booksCreateBody string, booksCreateBookCover string) (*books.Book, error) {
 	var err error
 	var body CreateRequestBody
 	{
 		err = json.Unmarshal([]byte(booksCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Sunt ut sint accusamus.\",\n      \"bookCover\": \"Omnis molestiae sed.\",\n      \"id\": 4527815212959476002,\n      \"publishedAt\": \"In optio dolor sed quo porro.\",\n      \"title\": \"Ipsam sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"ID\": 4698454743706616641,\n      \"author\": \"Ipsam sed.\",\n      \"publishedAt\": \"Sunt ut sint accusamus.\",\n      \"title\": \"Et odio est.\"\n   }'")
+		}
+	}
+	var bookCover string
+	{
+		bookCover = booksCreateBookCover
+		err = goa.MergeErrors(err, goa.ValidatePattern("bookCover", bookCover, "multipart/[^;]+; boundary=.+"))
+		if err != nil {
+			return nil, err
 		}
 	}
 	v := &books.Book{
 		ID:          body.ID,
 		Title:       body.Title,
 		Author:      body.Author,
-		BookCover:   body.BookCover,
 		PublishedAt: body.PublishedAt,
 	}
+	v.BookCover = bookCover
 
 	return v, nil
 }
@@ -44,7 +54,7 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	{
 		err = json.Unmarshal([]byte(booksUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"book\": {\n         \"author\": \"Eum maiores maxime.\",\n         \"bookCover\": \"Non dolores quasi saepe sunt est dolor.\",\n         \"id\": 4940795916846100831,\n         \"publishedAt\": \"Expedita commodi facere magni et.\",\n         \"title\": \"Eos consequuntur tempore.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"book\": {\n         \"ID\": 3012804354026031466,\n         \"author\": \"Aut eligendi repudiandae repellat.\",\n         \"bookCover\": \"multipart/form-data; boundary=goa\",\n         \"publishedAt\": \"Qui ut et quo est omnis dolor.\",\n         \"title\": \"Mollitia assumenda explicabo impedit nesciunt.\"\n      }\n   }'")
 		}
 	}
 	var id int

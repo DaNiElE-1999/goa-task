@@ -34,16 +34,32 @@ paths:
             summary: create books
             operationId: books#create
             parameters:
+                - name: Content-Type
+                  in: header
+                  description: Cover of the book
+                  required: false
+                  type: string
+                  default: multipart/form-data; boundary=goa
+                  pattern: multipart/[^;]+; boundary=.+
                 - name: CreateRequestBody
                   in: body
                   required: true
                   schema:
                     $ref: '#/definitions/BooksCreateRequestBody'
+                    required:
+                        - title
+                        - author
+                        - publishedAt
             responses:
                 "200":
                     description: OK response.
                     schema:
                         $ref: '#/definitions/BooksCreateResponseBody'
+                        required:
+                            - title
+                            - author
+                            - bookCover
+                            - publishedAt
             schemes:
                 - http
     /books/{id}:
@@ -63,6 +79,11 @@ paths:
                     description: OK response.
                     schema:
                         $ref: '#/definitions/BooksGetBookResponseBody'
+                        required:
+                            - title
+                            - author
+                            - bookCover
+                            - publishedAt
             schemes:
                 - http
         put:
@@ -86,6 +107,11 @@ paths:
                     description: OK response.
                     schema:
                         $ref: '#/definitions/BooksUpdateBookResponseBody'
+                        required:
+                            - title
+                            - author
+                            - bookCover
+                            - publishedAt
             schemes:
                 - http
         delete:
@@ -122,50 +148,21 @@ definitions:
         title: BookRequestBody
         type: object
         properties:
+            ID:
+                type: integer
+                description: id
+                example: 3560148692509608818
+                format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Distinctio sed occaecati sequi veniam.
+                example: Assumenda recusandae corrupti.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Omnis voluptate velit ratione sint voluptatibus quos.
-            id:
-                type: integer
-                description: Unique ID of the book
-                example: 5316936788496684629
-                format: int64
-            publishedAt:
-                type: string
-                description: Date the book has been published
-                example: Sed nihil fugit minima cupiditate.
-            title:
-                type: string
-                description: Title of the book
-                example: Odit repellendus rerum.
-        example:
-            author: Aut qui quis distinctio labore.
-            bookCover: Incidunt dignissimos sed omnis.
-            id: 8207999670637457491
-            publishedAt: Id rem libero a sunt.
-            title: Cupiditate consectetur.
-    BookResponse:
-        title: BookResponse
-        type: object
-        properties:
-            author:
-                type: string
-                description: Author of the book
-                example: Optio sed vitae a amet distinctio.
-            bookCover:
-                type: string
-                description: Cover of the book
-                example: Ea inventore porro assumenda recusandae corrupti.
-            id:
-                type: integer
-                description: Unique ID of the book
-                example: 9094929035047170638
-                format: int64
+                default: multipart/form-data; boundary=goa
+                example: multipart/form-data; boundary=goa
+                pattern: multipart/[^;]+; boundary=.+
             publishedAt:
                 type: string
                 description: Date the book has been published
@@ -173,106 +170,162 @@ definitions:
             title:
                 type: string
                 description: Title of the book
-                example: Autem debitis.
+                example: Vitae a amet distinctio reprehenderit ea inventore.
         example:
+            ID: 933868219178393708
             author: Voluptatem voluptatem ut ex et quasi.
-            bookCover: Qui et deleniti fugit est aut.
-            id: 933868219178393708
-            publishedAt: Et enim odio voluptatum.
+            bookCover: multipart/form-data; boundary=goa
+            publishedAt: Qui et deleniti fugit est aut.
             title: Eos facere placeat veniam voluptas accusamus ut.
+        required:
+            - title
+            - author
+            - bookCover
+            - publishedAt
+    BookResponse:
+        title: BookResponse
+        type: object
+        properties:
+            ID:
+                type: integer
+                description: id
+                example: 194060346287194780
+                format: int64
+            author:
+                type: string
+                description: Author of the book
+                example: In molestiae.
+            bookCover:
+                type: string
+                description: Cover of the book
+                default: multipart/form-data; boundary=goa
+                example: multipart/form-data; boundary=goa
+                pattern: multipart/[^;]+; boundary=.+
+            publishedAt:
+                type: string
+                description: Date the book has been published
+                example: Nostrum et amet dolores.
+            title:
+                type: string
+                description: Title of the book
+                example: Eveniet autem aliquam.
+        example:
+            ID: 6610887825911302372
+            author: Eum dolorum labore quas quidem sit.
+            bookCover: multipart/form-data; boundary=goa
+            publishedAt: Rerum illum vel qui totam incidunt aut.
+            title: Dolorem omnis voluptate quo veritatis doloribus nesciunt.
+        required:
+            - title
+            - author
+            - bookCover
+            - publishedAt
     BooksCreateRequestBody:
         title: BooksCreateRequestBody
         type: object
         properties:
-            author:
-                type: string
-                description: Author of the book
-                example: Eum dolorum labore quas quidem sit.
-            bookCover:
-                type: string
-                description: Cover of the book
-                example: Rerum illum vel qui totam incidunt aut.
-            id:
+            ID:
                 type: integer
-                description: Unique ID of the book
-                example: 3537087644036652157
+                description: id
+                example: 2442824487835556863
                 format: int64
-            publishedAt:
-                type: string
-                description: Date the book has been published
-                example: Mollitia error ratione delectus quas temporibus possimus.
-            title:
-                type: string
-                description: Title of the book
-                example: Voluptate quo veritatis doloribus nesciunt.
-        example:
-            author: Et qui.
-            bookCover: Voluptatem sit quasi.
-            id: 8251783029889772279
-            publishedAt: Nemo praesentium dolorem et vitae sunt a.
-            title: Amet provident velit voluptate.
-    BooksCreateResponseBody:
-        title: BooksCreateResponseBody
-        type: object
-        properties:
             author:
                 type: string
                 description: Author of the book
                 example: Amet iste saepe.
-            bookCover:
-                type: string
-                description: Cover of the book
-                example: Est temporibus voluptatibus occaecati sint.
-            id:
-                type: integer
-                description: Unique ID of the book
-                example: 6856166057270081167
-                format: int64
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Assumenda sed placeat perferendis quia.
+                example: Est temporibus voluptatibus occaecati sint.
             title:
                 type: string
                 description: Title of the book
-                example: Odit tenetur.
+                example: Aut occaecati odit tenetur.
         example:
-            author: Velit et unde eveniet.
-            bookCover: Aliquam laboriosam in molestiae repudiandae.
-            id: 2152028917879035118
-            publishedAt: Et amet dolores qui quam.
-            title: Consequuntur ut alias eos magnam qui quibusdam.
+            ID: 3409556471438418296
+            author: Sint consequuntur.
+            publishedAt: Alias eos magnam qui quibusdam quas velit.
+            title: Sed placeat perferendis quia.
+        required:
+            - title
+            - author
+            - publishedAt
+    BooksCreateResponseBody:
+        title: BooksCreateResponseBody
+        type: object
+        properties:
+            ID:
+                type: integer
+                description: id
+                example: 519258200057068739
+                format: int64
+            author:
+                type: string
+                description: Author of the book
+                example: Rerum enim quibusdam qui qui hic quia.
+            bookCover:
+                type: string
+                description: Cover of the book
+                default: multipart/form-data; boundary=goa
+                example: multipart/form-data; boundary=goa
+                pattern: multipart/[^;]+; boundary=.+
+            publishedAt:
+                type: string
+                description: Date the book has been published
+                example: In rem non.
+            title:
+                type: string
+                description: Title of the book
+                example: Quia eos repellendus itaque et.
+        example:
+            ID: 3967982326301678799
+            author: Repellendus rerum quia fuga eum.
+            bookCover: multipart/form-data; boundary=goa
+            publishedAt: Perferendis consequuntur sint ut ut et quis.
+            title: Sapiente nesciunt.
+        required:
+            - title
+            - author
+            - bookCover
+            - publishedAt
     BooksGetBookResponseBody:
         title: BooksGetBookResponseBody
         type: object
         properties:
+            ID:
+                type: integer
+                description: id
+                example: 4353567075589141598
+                format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Corrupti saepe laudantium qui eligendi.
+                example: Consequatur quia consequatur et sed aut doloribus.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Fuga est sed blanditiis et.
-            id:
-                type: integer
-                description: Unique ID of the book
-                example: 7244139769867850733
-                format: int64
+                default: multipart/form-data; boundary=goa
+                example: multipart/form-data; boundary=goa
+                pattern: multipart/[^;]+; boundary=.+
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Neque voluptas sequi soluta consequatur.
+                example: Accusantium quo.
             title:
                 type: string
                 description: Title of the book
-                example: Aut doloribus expedita autem quis iusto dolorem.
+                example: Enim odio voluptatum.
         example:
-            author: Dolore exercitationem ex odit.
-            bookCover: Est ut est sit et perferendis.
-            id: 1588809184003176921
-            publishedAt: Eos aperiam illum consequatur voluptatem illo tempora.
-            title: Ut quis hic et dicta et eum.
+            ID: 2049725647592791687
+            author: Fugit aut non quas et quos.
+            bookCover: multipart/form-data; boundary=goa
+            publishedAt: Delectus voluptatem tenetur eveniet earum.
+            title: Sapiente numquam consequatur fuga voluptatibus alias.
+        required:
+            - title
+            - author
+            - bookCover
+            - publishedAt
     BooksUpdateBookRequestBody:
         title: BooksUpdateBookRequestBody
         type: object
@@ -281,39 +334,46 @@ definitions:
                 $ref: '#/definitions/BookRequestBody'
         example:
             book:
-                author: Eum maiores maxime.
-                bookCover: Non dolores quasi saepe sunt est dolor.
-                id: 4940795916846100831
-                publishedAt: Expedita commodi facere magni et.
-                title: Eos consequuntur tempore.
+                ID: 3012804354026031466
+                author: Aut eligendi repudiandae repellat.
+                bookCover: multipart/form-data; boundary=goa
+                publishedAt: Qui ut et quo est omnis dolor.
+                title: Mollitia assumenda explicabo impedit nesciunt.
     BooksUpdateBookResponseBody:
         title: BooksUpdateBookResponseBody
         type: object
         properties:
+            ID:
+                type: integer
+                description: id
+                example: 461540920661239280
+                format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Sed aut.
+                example: Temporibus possimus natus tempore amet provident velit.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Iste accusantium quo aliquam sit.
-            id:
-                type: integer
-                description: Unique ID of the book
-                example: 8832309096929784805
-                format: int64
+                default: multipart/form-data; boundary=goa
+                example: multipart/form-data; boundary=goa
+                pattern: multipart/[^;]+; boundary=.+
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Numquam consequatur fuga voluptatibus alias et fugit.
+                example: Et et qui voluptatibus.
             title:
                 type: string
                 description: Title of the book
-                example: Quia consequatur.
+                example: Error ratione delectus.
         example:
-            author: Veritatis delectus voluptatem tenetur eveniet earum voluptatem.
-            bookCover: Error officiis et.
-            id: 3898703780982607212
-            publishedAt: Dolorum quas.
-            title: Quas et.
+            ID: 3193937602553499790
+            author: Dolorem et.
+            bookCover: multipart/form-data; boundary=goa
+            publishedAt: Sunt a quae quo autem debitis exercitationem.
+            title: Quasi in nemo.
+        required:
+            - title
+            - author
+            - bookCover
+            - publishedAt

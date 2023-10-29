@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -28,6 +27,11 @@ func isValidDateFormat(date string) bool {
 type bookssrvc struct {
 	logger *log.Logger
 	db     *sql.DB
+}
+
+// UpdateBook implements books.Service.
+func (*bookssrvc) UpdateBook(context.Context, *books.UpdateBookPayload) (res *books.Book, err error) {
+	panic("unimplemented")
 }
 
 // NewBooks returns the books service implementation.
@@ -68,17 +72,23 @@ func (s *bookssrvc) Create(ctx context.Context, p *books.Book) (res *books.Book,
 	s.logger.Print("books.create")
 
 	// Validate the date format
-	if p.PublishedAt != nil && !isValidDateFormat(*p.PublishedAt) {
+	if p.PublishedAt != "" && !isValidDateFormat(p.PublishedAt) {
 		return nil, ErrInvalidDateFormat
 	}
 
-	// Create the SQL query for inserting a new book
-	insertQuery := "INSERT INTO books (Title, Author, BookCover, PublishedAt) VALUES (?, ?, ?, ?)"
+	// // Decode the bookCover attribute as bytes
+	// bookCoverBytes, ok := p.BookCover.([]byte)
+	// if !ok {
+	// 	return nil, errors.New("Invalid bookCover data")
+	// }
 
-	// Execute the query using the reusable function
-	if err := s.executeQuery(insertQuery, *p.Title, *p.Author, *p.BookCover, *p.PublishedAt); err != nil {
-		return nil, err
-	}
+	// Create the SQL query for inserting a new book
+	// insertQuery := "INSERT INTO books (Title, Author, BookCover, PublishedAt) VALUES (?, ?, ?, ?)"
+
+	// // Execute the query using the reusable function
+	// if err := s.executeQuery(insertQuery, *&p.Title, *&p.Author, "test", p.PublishedAt); err != nil {
+	// 	return nil, err
+	// }
 
 	// Return the created book
 	return p, nil
@@ -116,58 +126,58 @@ func (s *bookssrvc) All(ctx context.Context) (res []*books.Book, err error) {
 	return booksList, nil
 }
 
-func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (res *books.Book, err error) {
-	s.logger.Print("books.updateBook")
+// func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) (res *books.Book, err error) {
+// 	s.logger.Print("books.updateBook")
 
-	// Validate the date format
-	if p.Book.PublishedAt != nil && !isValidDateFormat(*p.Book.PublishedAt) {
-		return nil, ErrInvalidDateFormat
-	}
+// 	// Validate the date format
+// 	if p.Book.PublishedAt != nil && !isValidDateFormat(*p.Book.PublishedAt) {
+// 		return nil, ErrInvalidDateFormat
+// 	}
 
-	// Initialize a list to store the SET clauses for the SQL query
-	var setClauses []string
+// 	// Initialize a list to store the SET clauses for the SQL query
+// 	var setClauses []string
 
-	// Initialize a list to store the arguments for the SQL query
-	var args []interface{}
+// 	// Initialize a list to store the arguments for the SQL query
+// 	var args []interface{}
 
-	// Check if the payload contains a title update
-	if p.Book.Title != nil {
-		setClauses = append(setClauses, "Title = ?")
-		args = append(args, *p.Book.Title)
-	}
+// 	// Check if the payload contains a title update
+// 	if p.Book.Title != nil {
+// 		setClauses = append(setClauses, "Title = ?")
+// 		args = append(args, *p.Book.Title)
+// 	}
 
-	// Check if the payload contains an author update
-	if p.Book.Author != nil {
-		setClauses = append(setClauses, "Author = ?")
-		args = append(args, *p.Book.Author)
-	}
+// 	// Check if the payload contains an author update
+// 	if p.Book.Author != nil {
+// 		setClauses = append(setClauses, "Author = ?")
+// 		args = append(args, *p.Book.Author)
+// 	}
 
-	// Check if the payload contains a bookCover update
-	if p.Book.BookCover != nil {
-		setClauses = append(setClauses, "BookCover = ?")
-		args = append(args, *p.Book.BookCover)
-	}
+// 	// Check if the payload contains a bookCover update
+// 	if p.Book.BookCover != nil {
+// 		setClauses = append(setClauses, "BookCover = ?")
+// 		args = append(args, *p.Book.BookCover)
+// 	}
 
-	// Check if the payload contains a publishedAt update
-	if p.Book.PublishedAt != nil {
-		setClauses = append(setClauses, "PublishedAt = ?")
-		args = append(args, *p.Book.PublishedAt)
-	}
+// 	// Check if the payload contains a publishedAt update
+// 	if p.Book.PublishedAt != nil {
+// 		setClauses = append(setClauses, "PublishedAt = ?")
+// 		args = append(args, *p.Book.PublishedAt)
+// 	}
 
-	// Add the ID for the WHERE clause
-	args = append(args, p.ID)
+// 	// Add the ID for the WHERE clause
+// 	args = append(args, p.ID)
 
-	// Create the SQL query with the SET clauses
-	updateQuery := "UPDATE books SET " + strings.Join(setClauses, ", ") + " WHERE Id = ?"
+// 	// Create the SQL query with the SET clauses
+// 	updateQuery := "UPDATE books SET " + strings.Join(setClauses, ", ") + " WHERE Id = ?"
 
-	// Execute the query using the reusable function
-	if err := s.executeQuery(updateQuery, args...); err != nil {
-		return nil, err
-	}
+// 	// Execute the query using the reusable function
+// 	if err := s.executeQuery(updateQuery, args...); err != nil {
+// 		return nil, err
+// 	}
 
-	// Return the updated book
-	return p.Book, nil
-}
+// 	// Return the updated book
+// 	return p.Book, nil
+// }
 
 // GetBook implements getBook.
 func (s *bookssrvc) GetBook(ctx context.Context, p *books.GetBookPayload) (res *books.Book, err error) {
