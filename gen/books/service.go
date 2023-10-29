@@ -9,6 +9,9 @@ package books
 
 import (
 	"context"
+	"io"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // API for Books
@@ -23,6 +26,8 @@ type Service interface {
 	GetBook(context.Context, *GetBookPayload) (res *Book, err error)
 	// DeleteBook implements deleteBook.
 	DeleteBook(context.Context, *DeleteBookPayload) (err error)
+	// Upload implements upload.
+	Upload(context.Context, *UploadPayload, io.ReadCloser) (err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -33,7 +38,7 @@ const ServiceName = "books"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"create", "all", "updateBook", "getBook", "deleteBook"}
+var MethodNames = [6]string{"create", "all", "updateBook", "getBook", "deleteBook", "upload"}
 
 // Book is the payload type of the books service create method.
 type Book struct {
@@ -66,4 +71,28 @@ type UpdateBookPayload struct {
 	// Book ID
 	ID   *int
 	Book *Book
+}
+
+// UploadPayload is the payload type of the books service upload method.
+type UploadPayload struct {
+	// Content-Type header, must define value for multipart boundary.
+	ContentType string
+	// Dir is the relative path to the file directory where the uploaded content is
+	// saved.
+	Dir string
+}
+
+// MakeInvalidMediaType builds a goa.ServiceError from an error.
+func MakeInvalidMediaType(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_media_type", false, false, false)
+}
+
+// MakeInvalidMultipartRequest builds a goa.ServiceError from an error.
+func MakeInvalidMultipartRequest(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "invalid_multipart_request", false, false, false)
+}
+
+// MakeInternalError builds a goa.ServiceError from an error.
+func MakeInternalError(err error) *goa.ServiceError {
+	return goa.NewServiceError(err, "internal_error", false, false, false)
 }

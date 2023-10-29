@@ -137,6 +137,39 @@ paths:
                         type: file
             schemes:
                 - http
+    /upload/{dir}:
+        post:
+            tags:
+                - books
+            summary: upload books
+            operationId: books#upload
+            parameters:
+                - name: dir
+                  in: path
+                  description: Dir is the relative path to the file directory where the uploaded content is saved.
+                  required: true
+                  type: string
+                  default: upload
+                - name: Content-Type
+                  in: header
+                  description: Content-Type header, must define value for multipart boundary.
+                  required: false
+                  type: string
+                  default: multipart/form-data; boundary=goa
+                  pattern: multipart/[^;]+; boundary=.+
+            responses:
+                "204":
+                    description: No Content response.
+                "400":
+                    description: Bad Request response.
+                    schema:
+                        $ref: '#/definitions/BooksUploadInvalidMultipartRequestResponseBody'
+                "500":
+                    description: Internal Server Error response.
+                    schema:
+                        $ref: '#/definitions/BooksUploadInternalErrorResponseBody'
+            schemes:
+                - http
 definitions:
     BookRequestBody:
         title: BookRequestBody
@@ -145,30 +178,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 5316936788496684629
+                example: 8207999670637457491
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Distinctio sed occaecati sequi veniam.
+                example: Aut qui quis distinctio labore.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Omnis voluptate velit ratione sint voluptatibus quos.
+                example: Incidunt dignissimos sed omnis.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Sed nihil fugit minima cupiditate.
+                example: Id rem libero a sunt.
             title:
                 type: string
                 description: Title of the book
-                example: Odit repellendus rerum.
+                example: Cupiditate consectetur.
         example:
-            ID: 8207999670637457491
-            author: Aut qui quis distinctio labore.
-            bookCover: Incidunt dignissimos sed omnis.
-            publishedAt: Id rem libero a sunt.
-            title: Cupiditate consectetur.
+            ID: 7244139769867850733
+            author: Corrupti saepe laudantium qui eligendi.
+            bookCover: Fuga est sed blanditiis et.
+            publishedAt: Neque voluptas sequi soluta consequatur.
+            title: Aut doloribus expedita autem quis iusto dolorem.
         required:
             - title
             - author
@@ -181,30 +214,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 9094929035047170638
+                example: 2287655650316980253
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Optio sed vitae a amet distinctio.
+                example: Ut corrupti voluptatem voluptatem ut.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Ea inventore porro assumenda recusandae corrupti.
+                example: Et quasi et qui et deleniti.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Doloribus similique possimus quia.
+                example: Est aut minus et enim odio.
             title:
                 type: string
                 description: Title of the book
-                example: Autem debitis.
+                example: Blanditiis possimus eos facere placeat veniam voluptas.
         example:
-            ID: 933868219178393708
-            author: Voluptatem voluptatem ut ex et quasi.
-            bookCover: Qui et deleniti fugit est aut.
-            publishedAt: Et enim odio voluptatum.
-            title: Eos facere placeat veniam voluptas accusamus ut.
+            ID: 1631448103832248093
+            author: Accusantium quo.
+            bookCover: Sit sapiente numquam consequatur fuga.
+            publishedAt: Alias et fugit.
+            title: Consequatur quia consequatur et sed aut doloribus.
         required:
             - title
             - author
@@ -217,30 +250,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 3537087644036652157
+                example: 461540920661239280
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Eum dolorum labore quas quidem sit.
+                example: Temporibus possimus natus tempore amet provident velit.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Rerum illum vel qui totam incidunt aut.
+                example: Et et qui voluptatibus.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Mollitia error ratione delectus quas temporibus possimus.
+                example: Sit quasi in.
             title:
                 type: string
                 description: Title of the book
-                example: Voluptate quo veritatis doloribus nesciunt.
+                example: Error ratione delectus.
         example:
-            ID: 8251783029889772279
-            author: Et qui.
-            bookCover: Voluptatem sit quasi.
-            publishedAt: Nemo praesentium dolorem et vitae sunt a.
-            title: Amet provident velit voluptate.
+            ID: 1349218759029671271
+            author: Sunt a quae quo autem debitis exercitationem.
+            bookCover: Sed vitae a amet distinctio reprehenderit ea.
+            publishedAt: Porro assumenda recusandae corrupti quam doloribus similique.
+            title: Dolorem et.
         required:
             - title
             - author
@@ -253,30 +286,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 6856166057270081167
+                example: 50291292617211897
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Amet iste saepe.
+                example: Consequuntur ut alias eos magnam qui quibusdam.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Est temporibus voluptatibus occaecati sint.
+                example: Velit et unde eveniet.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Assumenda sed placeat perferendis quia.
+                example: Aliquam laboriosam in molestiae repudiandae.
             title:
                 type: string
                 description: Title of the book
-                example: Odit tenetur.
+                example: Molestias assumenda sed placeat perferendis quia et.
         example:
-            ID: 2152028917879035118
-            author: Velit et unde eveniet.
-            bookCover: Aliquam laboriosam in molestiae repudiandae.
-            publishedAt: Et amet dolores qui quam.
-            title: Consequuntur ut alias eos magnam qui quibusdam.
+            ID: 8403090221909196608
+            author: Voluptate quo veritatis doloribus nesciunt.
+            bookCover: Eum dolorum labore quas quidem sit.
+            publishedAt: Rerum illum vel qui totam incidunt aut.
+            title: Amet dolores qui quam dolorem.
         required:
             - title
             - author
@@ -289,30 +322,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 7244139769867850733
+                example: 1588809184003176921
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Corrupti saepe laudantium qui eligendi.
+                example: Dolore exercitationem ex odit.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Fuga est sed blanditiis et.
+                example: Est ut est sit et perferendis.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Neque voluptas sequi soluta consequatur.
+                example: Eos aperiam illum consequatur voluptatem illo tempora.
             title:
                 type: string
                 description: Title of the book
-                example: Aut doloribus expedita autem quis iusto dolorem.
+                example: Ut quis hic et dicta et eum.
         example:
-            ID: 1588809184003176921
-            author: Dolore exercitationem ex odit.
-            bookCover: Est ut est sit et perferendis.
-            publishedAt: Eos aperiam illum consequatur voluptatem illo tempora.
-            title: Ut quis hic et dicta et eum.
+            ID: 3053542106201439437
+            author: Consequatur totam culpa.
+            bookCover: Culpa in qui.
+            publishedAt: Officia exercitationem.
+            title: Occaecati eaque nulla consequuntur delectus atque.
         required:
             - title
             - author
@@ -338,32 +371,161 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 8832309096929784805
+                example: 3898703780982607212
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Sed aut.
+                example: Veritatis delectus voluptatem tenetur eveniet earum voluptatem.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Iste accusantium quo aliquam sit.
+                example: Error officiis et.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Numquam consequatur fuga voluptatibus alias et fugit.
+                example: Dolorum quas.
             title:
                 type: string
                 description: Title of the book
-                example: Quia consequatur.
+                example: Quas et.
         example:
-            ID: 3898703780982607212
-            author: Veritatis delectus voluptatem tenetur eveniet earum voluptatem.
-            bookCover: Error officiis et.
-            publishedAt: Dolorum quas.
-            title: Quas et.
+            ID: 5316936788496684629
+            author: Distinctio sed occaecati sequi veniam.
+            bookCover: Omnis voluptate velit ratione sint voluptatibus quos.
+            publishedAt: Sed nihil fugit minima cupiditate.
+            title: Odit repellendus rerum.
         required:
             - title
             - author
             - bookCover
             - publishedAt
+    BooksUploadInternalErrorResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Fault while processing upload. (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: true
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksUploadInvalidMediaTypeResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: true
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: false
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: true
+        description: Error returned when the Content-Type header does not define a multipart request. (default view)
+        example:
+            fault: true
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault
+    BooksUploadInvalidMultipartRequestResponseBody:
+        title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+        type: object
+        properties:
+            fault:
+                type: boolean
+                description: Is the error a server-side fault?
+                example: false
+            id:
+                type: string
+                description: ID is a unique identifier for this particular occurrence of the problem.
+                example: 123abc
+            message:
+                type: string
+                description: Message is a human-readable explanation specific to this occurrence of the problem.
+                example: parameter 'p' must be an integer
+            name:
+                type: string
+                description: Name is the name of this class of errors.
+                example: bad_request
+            temporary:
+                type: boolean
+                description: Is the error temporary?
+                example: true
+            timeout:
+                type: boolean
+                description: Is the error a timeout?
+                example: false
+        description: Error returned when the request body is not a valid multipart content. (default view)
+        example:
+            fault: false
+            id: 123abc
+            message: parameter 'p' must be an integer
+            name: bad_request
+            temporary: false
+            timeout: false
+        required:
+            - name
+            - id
+            - message
+            - temporary
+            - timeout
+            - fault

@@ -24,6 +24,7 @@ type Server struct {
 	UpdateBook          http.Handler
 	GetBook             http.Handler
 	DeleteBook          http.Handler
+	Upload              http.Handler
 	GenHTTPOpenapi3JSON http.Handler
 }
 
@@ -63,6 +64,7 @@ func New(
 			{"UpdateBook", "PUT", "/books/{id}"},
 			{"GetBook", "GET", "/books/{id}"},
 			{"DeleteBook", "DELETE", "/books/{id}"},
+			{"Upload", "POST", "/upload/{*dir}"},
 			{"./gen/http/openapi3.json", "GET", "/openapi3.json"},
 		},
 		Create:              NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
@@ -70,6 +72,7 @@ func New(
 		UpdateBook:          NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
 		GetBook:             NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
 		DeleteBook:          NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
+		Upload:              NewUploadHandler(e.Upload, mux, decoder, encoder, errhandler, formatter),
 		GenHTTPOpenapi3JSON: http.FileServer(fileSystemGenHTTPOpenapi3JSON),
 	}
 }
@@ -84,6 +87,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.UpdateBook = m(s.UpdateBook)
 	s.GetBook = m(s.GetBook)
 	s.DeleteBook = m(s.DeleteBook)
+	s.Upload = m(s.Upload)
 }
 
 // MethodNames returns the methods served.
@@ -96,6 +100,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountUpdateBookHandler(mux, h.UpdateBook)
 	MountGetBookHandler(mux, h.GetBook)
 	MountDeleteBookHandler(mux, h.DeleteBook)
+	MountUploadHandler(mux, h.Upload)
 	MountGenHTTPOpenapi3JSON(mux, goahttp.Replace("", "/./gen/http/openapi3.json", h.GenHTTPOpenapi3JSON))
 }
 
@@ -340,6 +345,58 @@ func NewDeleteBookHandler(
 			return
 		}
 		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUploadHandler configures the mux to serve the "books" service "upload"
+// endpoint.
+func MountUploadHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/upload/{*dir}", f)
+}
+
+// NewUploadHandler creates a HTTP handler which loads the HTTP request and
+// calls the "books" service "upload" endpoint.
+func NewUploadHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUploadRequest(mux, decoder)
+		encodeResponse = EncodeUploadResponse(encoder)
+		encodeError    = EncodeUploadError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "upload")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "books")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		data := &books.UploadRequestData{Payload: payload.(*books.UploadPayload), Body: r.Body}
+		res, err := endpoint(ctx, data)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

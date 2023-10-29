@@ -5,8 +5,13 @@ import (
 	context "context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"io"
 	"log"
+	"mime"
+	"mime/multipart"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -28,6 +33,7 @@ func isValidDateFormat(date string) bool {
 type bookssrvc struct {
 	logger *log.Logger
 	db     *sql.DB
+	dir    string // Path to download and upload directory
 }
 
 // NewBooks returns the books service implementation.
@@ -199,4 +205,103 @@ func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) 
 	}
 
 	return nil
+}
+
+// Upload implements file upload.
+// func (s *bookssrvc) Upload(ctx context.Context, p *books.UploadPayload, req io.ReadCloser) error {
+// 	defer req.Close() // Close the request body when done
+
+// 	// Ensure the upload directory exists
+// 	uploadDir := filepath.Join(s.dir, p.Dir)
+// 	if err := os.MkdirAll(uploadDir, 0777); err != nil {
+// 		return books.MakeInternalError(err)
+// 	}
+
+// 	s.logger.Printf("Upload directory: %s\n", uploadDir)
+
+// 	// Create a multipart request reader
+// 	_, params, err := mime.ParseMediaType(p.ContentType)
+// 	if err != nil {
+// 		return books.MakeInvalidMediaType(err)
+// 	}
+// 	mr := multipart.NewReader(req, params["boundary"])
+
+// 	// Process each part of the multipart request
+// 	for {
+// 		part, err := mr.NextPart()
+// 		if err == io.EOF {
+// 			// No more parts, we're done!
+// 			return nil
+// 		}
+// 		if err != nil {
+// 			return books.MakeInvalidMultipartRequest(err)
+// 		}
+
+// 		// Create the uploaded file, potentially overwriting an existing file
+// 		fpath := filepath.Join(uploadDir, part.FileName())
+// 		f, err := os.Create(fpath)
+// 		if err != nil {
+// 			return books.MakeInternalError(err)
+// 		}
+// 		defer f.Close() // Close the file when done
+
+// 		// Stream content to the disk
+// 		n, copyErr := io.Copy(f, part)
+// 		if copyErr != nil {
+// 			return books.MakeInternalError(copyErr)
+// 		}
+// 		s.logger.Printf("Written %d bytes to %q", n, fpath)
+// 	}
+// }
+
+// Upload implements upload.
+func (s *bookssrvc) Upload(ctx context.Context, p *books.UploadPayload, req io.ReadCloser) error {
+	// Don't forget to close the body reader!
+	defer req.Close()
+
+	s.logger.Print(s.dir)
+	s.logger.Print(p.Dir)
+
+	// Make sure upload directory exists
+	uploadDir := filepath.Join(s.dir, p.Dir)
+	if err := os.MkdirAll(uploadDir, 0777); err != nil {
+		return books.MakeInternalError(err)
+	}
+
+	// Createa multipart request reader
+	_, params, err := mime.ParseMediaType(p.ContentType)
+	if err != nil {
+		return books.MakeInvalidMediaType(err)
+	}
+	mr := multipart.NewReader(req, params["boundary"])
+
+	fmt.Printf("mr: %v\n", mr)
+
+	//Go through each part and save the corresponding content to disk.
+	for {
+		part, err := mr.NextPart()
+		if err == io.EOF {
+			// We're done!
+			return nil
+		}
+		if err != nil {
+			return books.MakeInvalidMultipartRequest(err)
+		}
+
+		// Create uploaded file, potentially overridding existing file.
+		fpath := filepath.Join(uploadDir, part.FileName())
+		f, err := os.Create(fpath)
+		if err != nil {
+			return books.MakeInternalError(err)
+		}
+		defer f.Close()
+
+		// Stream content to disk.
+		n, err := io.Copy(f, part)
+		if err != nil {
+			return books.MakeInternalError(err)
+		}
+		s.logger.Printf("Written %d bytes to %q", n, fpath)
+	}
+
 }

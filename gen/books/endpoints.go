@@ -9,6 +9,7 @@ package books
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -20,6 +21,16 @@ type Endpoints struct {
 	UpdateBook goa.Endpoint
 	GetBook    goa.Endpoint
 	DeleteBook goa.Endpoint
+	Upload     goa.Endpoint
+}
+
+// UploadRequestData holds both the payload and the HTTP request body reader of
+// the "upload" method.
+type UploadRequestData struct {
+	// Payload is the method payload.
+	Payload *UploadPayload
+	// Body streams the HTTP request body.
+	Body io.ReadCloser
 }
 
 // NewEndpoints wraps the methods of the "books" service with endpoints.
@@ -30,6 +41,7 @@ func NewEndpoints(s Service) *Endpoints {
 		UpdateBook: NewUpdateBookEndpoint(s),
 		GetBook:    NewGetBookEndpoint(s),
 		DeleteBook: NewDeleteBookEndpoint(s),
+		Upload:     NewUploadEndpoint(s),
 	}
 }
 
@@ -40,6 +52,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.UpdateBook = m(e.UpdateBook)
 	e.GetBook = m(e.GetBook)
 	e.DeleteBook = m(e.DeleteBook)
+	e.Upload = m(e.Upload)
 }
 
 // NewCreateEndpoint returns an endpoint function that calls the method
@@ -83,5 +96,14 @@ func NewDeleteBookEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		p := req.(*DeleteBookPayload)
 		return nil, s.DeleteBook(ctx, p)
+	}
+}
+
+// NewUploadEndpoint returns an endpoint function that calls the method
+// "upload" of service "books".
+func NewUploadEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		ep := req.(*UploadRequestData)
+		return nil, s.Upload(ctx, ep.Payload, ep.Body)
 	}
 }

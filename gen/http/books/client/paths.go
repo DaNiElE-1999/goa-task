@@ -35,3 +35,8 @@ func GetBookBooksPath(id int) string {
 func DeleteBookBooksPath(id int) string {
 	return fmt.Sprintf("/books/%v", id)
 }
+
+// UploadBooksPath returns the URL path to the books service upload HTTP endpoint.
+func UploadBooksPath(dir string) string {
+	return fmt.Sprintf("/upload/%v", dir)
+}

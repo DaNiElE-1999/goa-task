@@ -12,6 +12,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildCreatePayload builds the payload for the books create endpoint from CLI
@@ -27,10 +29,10 @@ func BuildCreatePayload(booksCreateBody string) (*books.Book, error) {
 	}
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       body.Title,
-		Author:      body.Author,
-		BookCover:   body.BookCover,
-		PublishedAt: body.PublishedAt,
+		Title:       &body.Title,
+		Author:      &body.Author,
+		BookCover:   &body.BookCover,
+		PublishedAt: &body.PublishedAt,
 	}
 
 	return v, nil
@@ -99,6 +101,31 @@ func BuildDeleteBookPayload(booksDeleteBookID string) (*books.DeleteBookPayload,
 	}
 	v := &books.DeleteBookPayload{}
 	v.ID = &id
+
+	return v, nil
+}
+
+// BuildUploadPayload builds the payload for the books upload endpoint from CLI
+// flags.
+func BuildUploadPayload(booksUploadDir string, booksUploadContentType string) (*books.UploadPayload, error) {
+	var err error
+	var dir string
+	{
+		dir = booksUploadDir
+	}
+	var contentType string
+	{
+		if booksUploadContentType != "" {
+			contentType = booksUploadContentType
+			err = goa.MergeErrors(err, goa.ValidatePattern("content_type", contentType, "multipart/[^;]+; boundary=.+"))
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	v := &books.UploadPayload{}
+	v.Dir = dir
+	v.ContentType = contentType
 
 	return v, nil
 }
