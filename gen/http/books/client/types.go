@@ -9,21 +9,23 @@ package client
 
 import (
 	books "books/gen/books"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // CreateRequestBody is the type of the "books" service "create" endpoint HTTP
 // request body.
 type CreateRequestBody struct {
 	// Unique ID of the book
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID *int `form:"ID,omitempty" json:"ID,omitempty" xml:"ID,omitempty"`
 	// Title of the book
-	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Title string `form:"title" json:"title" xml:"title"`
 	// Author of the book
-	Author *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Author string `form:"author" json:"author" xml:"author"`
 	// Cover of the book
-	BookCover *string `form:"bookCover,omitempty" json:"bookCover,omitempty" xml:"bookCover,omitempty"`
+	BookCover string `form:"bookCover" json:"bookCover" xml:"bookCover"`
 	// Date the book has been published
-	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
+	PublishedAt string `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // UpdateBookRequestBody is the type of the "books" service "updateBook"
@@ -36,7 +38,7 @@ type UpdateBookRequestBody struct {
 // response body.
 type CreateResponseBody struct {
 	// Unique ID of the book
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID *int `form:"ID,omitempty" json:"ID,omitempty" xml:"ID,omitempty"`
 	// Title of the book
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// Author of the book
@@ -55,7 +57,7 @@ type AllResponseBody []*BookResponse
 // endpoint HTTP response body.
 type UpdateBookResponseBody struct {
 	// Unique ID of the book
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID *int `form:"ID,omitempty" json:"ID,omitempty" xml:"ID,omitempty"`
 	// Title of the book
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// Author of the book
@@ -70,7 +72,7 @@ type UpdateBookResponseBody struct {
 // HTTP response body.
 type GetBookResponseBody struct {
 	// Unique ID of the book
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID *int `form:"ID,omitempty" json:"ID,omitempty" xml:"ID,omitempty"`
 	// Title of the book
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// Author of the book
@@ -84,7 +86,7 @@ type GetBookResponseBody struct {
 // BookResponse is used to define fields on response body types.
 type BookResponse struct {
 	// Unique ID of the book
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID *int `form:"ID,omitempty" json:"ID,omitempty" xml:"ID,omitempty"`
 	// Title of the book
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
 	// Author of the book
@@ -98,15 +100,15 @@ type BookResponse struct {
 // BookRequestBody is used to define fields on request body types.
 type BookRequestBody struct {
 	// Unique ID of the book
-	ID *int `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID *int `form:"ID,omitempty" json:"ID,omitempty" xml:"ID,omitempty"`
 	// Title of the book
-	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Title string `form:"title" json:"title" xml:"title"`
 	// Author of the book
-	Author *string `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Author string `form:"author" json:"author" xml:"author"`
 	// Cover of the book
-	BookCover *string `form:"bookCover,omitempty" json:"bookCover,omitempty" xml:"bookCover,omitempty"`
+	BookCover string `form:"bookCover" json:"bookCover" xml:"bookCover"`
 	// Date the book has been published
-	PublishedAt *string `form:"publishedAt,omitempty" json:"publishedAt,omitempty" xml:"publishedAt,omitempty"`
+	PublishedAt string `form:"publishedAt" json:"publishedAt" xml:"publishedAt"`
 }
 
 // NewCreateRequestBody builds the HTTP request body from the payload of the
@@ -137,10 +139,10 @@ func NewUpdateBookRequestBody(p *books.UpdateBookPayload) *UpdateBookRequestBody
 func NewCreateBookOK(body *CreateResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       body.Title,
-		Author:      body.Author,
-		BookCover:   body.BookCover,
-		PublishedAt: body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v
@@ -162,10 +164,10 @@ func NewAllBookOK(body []*BookResponse) []*books.Book {
 func NewUpdateBookBookOK(body *UpdateBookResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       body.Title,
-		Author:      body.Author,
-		BookCover:   body.BookCover,
-		PublishedAt: body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v
@@ -176,11 +178,81 @@ func NewUpdateBookBookOK(body *UpdateBookResponseBody) *books.Book {
 func NewGetBookBookOK(body *GetBookResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       body.Title,
-		Author:      body.Author,
-		BookCover:   body.BookCover,
-		PublishedAt: body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v
+}
+
+// ValidateCreateResponseBody runs the validations defined on CreateResponseBody
+func ValidateCreateResponseBody(body *CreateResponseBody) (err error) {
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.BookCover == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bookCover", "body"))
+	}
+	if body.PublishedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookResponseBody runs the validations defined on
+// UpdateBookResponseBody
+func ValidateUpdateBookResponseBody(body *UpdateBookResponseBody) (err error) {
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.BookCover == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bookCover", "body"))
+	}
+	if body.PublishedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
+	}
+	return
+}
+
+// ValidateGetBookResponseBody runs the validations defined on
+// GetBookResponseBody
+func ValidateGetBookResponseBody(body *GetBookResponseBody) (err error) {
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.BookCover == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bookCover", "body"))
+	}
+	if body.PublishedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
+	}
+	return
+}
+
+// ValidateBookResponse runs the validations defined on BookResponse
+func ValidateBookResponse(body *BookResponse) (err error) {
+	if body.Title == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("title", "body"))
+	}
+	if body.Author == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("author", "body"))
+	}
+	if body.BookCover == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("bookCover", "body"))
+	}
+	if body.PublishedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("publishedAt", "body"))
+	}
+	return
 }

@@ -11,7 +11,7 @@ import (
 	"context"
 )
 
-// API for Users
+// API for Books
 type Service interface {
 	// Create implements create.
 	Create(context.Context, *Book) (res *Book, err error)

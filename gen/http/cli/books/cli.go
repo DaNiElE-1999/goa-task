@@ -29,9 +29,9 @@ func UsageCommands() string {
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` books create --body '{
+      "ID": 4527815212959476002,
       "author": "Sunt ut sint accusamus.",
       "bookCover": "Omnis molestiae sed.",
-      "id": 4527815212959476002,
       "publishedAt": "In optio dolor sed quo porro.",
       "title": "Ipsam sed."
    }'` + "\n" +
@@ -173,7 +173,7 @@ func ParseEndpoint(
 
 // booksUsage displays the usage of the books command and its subcommands.
 func booksUsage() {
-	fmt.Fprintf(os.Stderr, `API for Users
+	fmt.Fprintf(os.Stderr, `API for Books
 Usage:
     %[1]s [globalflags] books COMMAND [flags]
 
@@ -196,9 +196,9 @@ Create implements create.
 
 Example:
     %[1]s books create --body '{
+      "ID": 4527815212959476002,
       "author": "Sunt ut sint accusamus.",
       "bookCover": "Omnis molestiae sed.",
-      "id": 4527815212959476002,
       "publishedAt": "In optio dolor sed quo porro.",
       "title": "Ipsam sed."
    }'
@@ -225,9 +225,9 @@ UpdateBook implements updateBook.
 Example:
     %[1]s books update-book --body '{
       "book": {
+         "ID": 4940795916846100831,
          "author": "Eum maiores maxime.",
          "bookCover": "Non dolores quasi saepe sunt est dolor.",
-         "id": 4940795916846100831,
          "publishedAt": "Expedita commodi facere magni et.",
          "title": "Eos consequuntur tempore."
       }

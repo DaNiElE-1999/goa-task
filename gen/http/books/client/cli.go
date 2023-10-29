@@ -22,7 +22,7 @@ func BuildCreatePayload(booksCreateBody string) (*books.Book, error) {
 	{
 		err = json.Unmarshal([]byte(booksCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"author\": \"Sunt ut sint accusamus.\",\n      \"bookCover\": \"Omnis molestiae sed.\",\n      \"id\": 4527815212959476002,\n      \"publishedAt\": \"In optio dolor sed quo porro.\",\n      \"title\": \"Ipsam sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"ID\": 4527815212959476002,\n      \"author\": \"Sunt ut sint accusamus.\",\n      \"bookCover\": \"Omnis molestiae sed.\",\n      \"publishedAt\": \"In optio dolor sed quo porro.\",\n      \"title\": \"Ipsam sed.\"\n   }'")
 		}
 	}
 	v := &books.Book{
@@ -44,7 +44,7 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	{
 		err = json.Unmarshal([]byte(booksUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"book\": {\n         \"author\": \"Eum maiores maxime.\",\n         \"bookCover\": \"Non dolores quasi saepe sunt est dolor.\",\n         \"id\": 4940795916846100831,\n         \"publishedAt\": \"Expedita commodi facere magni et.\",\n         \"title\": \"Eos consequuntur tempore.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"book\": {\n         \"ID\": 4940795916846100831,\n         \"author\": \"Eum maiores maxime.\",\n         \"bookCover\": \"Non dolores quasi saepe sunt est dolor.\",\n         \"publishedAt\": \"Expedita commodi facere magni et.\",\n         \"title\": \"Eos consequuntur tempore.\"\n      }\n   }'")
 		}
 	}
 	var id int

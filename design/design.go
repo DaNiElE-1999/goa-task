@@ -15,6 +15,7 @@ var _ = API("books", func() {
 })
 
 var Book = Type("Book", func() {
+	Attribute("ID", Int, "Unique ID of the book")
 	Attribute("title", String, "Title of the book")
 	Attribute("author", String, "Author of the book")
 	Attribute("bookCover", String, "Cover of the book")
