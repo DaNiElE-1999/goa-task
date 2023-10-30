@@ -170,6 +170,26 @@ paths:
                         $ref: '#/definitions/BooksUploadInternalErrorResponseBody'
             schemes:
                 - http
+    /uploadBookCover:
+        post:
+            tags:
+                - books
+            summary: uploadImage books
+            description: Upload an image
+            operationId: books#uploadImage
+            consumes:
+                - multipart/form-data
+            parameters:
+                - name: UploadImageRequestBody
+                  in: formData
+                  required: true
+                  schema:
+                    $ref: '#/definitions/BooksUploadImageRequestBody'
+            responses:
+                "200":
+                    description: OK response.
+            schemes:
+                - http
 definitions:
     BookRequestBody:
         title: BookRequestBody
@@ -214,30 +234,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 2287655650316980253
+                example: 933868219178393708
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Ut corrupti voluptatem voluptatem ut.
+                example: Voluptatem voluptatem ut ex et quasi.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Et quasi et qui et deleniti.
+                example: Qui et deleniti fugit est aut.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Est aut minus et enim odio.
+                example: Et enim odio voluptatum.
             title:
                 type: string
                 description: Title of the book
-                example: Blanditiis possimus eos facere placeat veniam voluptas.
+                example: Eos facere placeat veniam voluptas accusamus ut.
         example:
-            ID: 1631448103832248093
-            author: Accusantium quo.
-            bookCover: Sit sapiente numquam consequatur fuga.
-            publishedAt: Alias et fugit.
-            title: Consequatur quia consequatur et sed aut doloribus.
+            ID: 8832309096929784805
+            author: Sed aut.
+            bookCover: Iste accusantium quo aliquam sit.
+            publishedAt: Numquam consequatur fuga voluptatibus alias et fugit.
+            title: Quia consequatur.
         required:
             - title
             - author
@@ -250,30 +270,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 461540920661239280
+                example: 8321567011252959992
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Temporibus possimus natus tempore amet provident velit.
+                example: Et et qui voluptatibus.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Et et qui voluptatibus.
+                example: Sit quasi in.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Sit quasi in.
+                example: Praesentium dolorem et vitae sunt a.
             title:
                 type: string
                 description: Title of the book
-                example: Error ratione delectus.
+                example: Temporibus possimus natus tempore amet provident velit.
         example:
-            ID: 1349218759029671271
-            author: Sunt a quae quo autem debitis exercitationem.
-            bookCover: Sed vitae a amet distinctio reprehenderit ea.
-            publishedAt: Porro assumenda recusandae corrupti quam doloribus similique.
-            title: Dolorem et.
+            ID: 9094929035047170638
+            author: Optio sed vitae a amet distinctio.
+            bookCover: Ea inventore porro assumenda recusandae corrupti.
+            publishedAt: Doloribus similique possimus quia.
+            title: Autem debitis.
         required:
             - title
             - author
@@ -286,30 +306,30 @@ definitions:
             ID:
                 type: integer
                 description: Unique ID of the book
-                example: 50291292617211897
+                example: 1641333832562103870
                 format: int64
             author:
                 type: string
                 description: Author of the book
-                example: Consequuntur ut alias eos magnam qui quibusdam.
+                example: Aliquam laboriosam in molestiae repudiandae.
             bookCover:
                 type: string
                 description: Cover of the book
-                example: Velit et unde eveniet.
+                example: Et amet dolores qui quam.
             publishedAt:
                 type: string
                 description: Date the book has been published
-                example: Aliquam laboriosam in molestiae repudiandae.
+                example: Omnis voluptate quo veritatis.
             title:
                 type: string
                 description: Title of the book
-                example: Molestias assumenda sed placeat perferendis quia et.
+                example: Quibusdam quas velit et unde eveniet.
         example:
-            ID: 8403090221909196608
-            author: Voluptate quo veritatis doloribus nesciunt.
-            bookCover: Eum dolorum labore quas quidem sit.
-            publishedAt: Rerum illum vel qui totam incidunt aut.
-            title: Amet dolores qui quam dolorem.
+            ID: 708357737794063594
+            author: Sit fuga rerum illum.
+            bookCover: Qui totam incidunt.
+            publishedAt: Possimus mollitia error ratione.
+            title: Voluptatibus eum dolorum labore quas.
         required:
             - title
             - author
@@ -359,11 +379,11 @@ definitions:
                 $ref: '#/definitions/BookRequestBody'
         example:
             book:
-                ID: 4940795916846100831
-                author: Eum maiores maxime.
-                bookCover: Non dolores quasi saepe sunt est dolor.
-                publishedAt: Expedita commodi facere magni et.
-                title: Eos consequuntur tempore.
+                ID: 267326349154593595
+                author: Expedita commodi facere magni et.
+                bookCover: Est quibusdam rerum.
+                publishedAt: Dolor labore.
+                title: Quasi saepe sunt est dolor.
     BooksUpdateBookResponseBody:
         title: BooksUpdateBookResponseBody
         type: object
@@ -400,6 +420,114 @@ definitions:
             - author
             - bookCover
             - publishedAt
+    BooksUploadImageRequestBody:
+        title: BooksUploadImageRequestBody
+        type: object
+        properties:
+            content_type:
+                type: string
+                description: Content-Type header, must define value for multipart boundary.
+                default: multipart/form-data; boundary=goa
+                example: "multipart/\U00020DC7\U00058132; boundary=��"
+                pattern: multipart/[^;]+; boundary=.+
+            image:
+                type: string
+                description: Binary data of the image
+                example:
+                    - 67
+                    - 111
+                    - 109
+                    - 109
+                    - 111
+                    - 100
+                    - 105
+                    - 32
+                    - 115
+                    - 101
+                    - 100
+                    - 32
+                    - 97
+                    - 112
+                    - 101
+                    - 114
+                    - 105
+                    - 97
+                    - 109
+                    - 32
+                    - 108
+                    - 97
+                    - 98
+                    - 111
+                    - 114
+                    - 117
+                    - 109
+                    - 32
+                    - 113
+                    - 117
+                    - 105
+                    - 97
+                    - 32
+                    - 97
+                    - 99
+                    - 99
+                    - 117
+                    - 115
+                    - 97
+                    - 109
+                    - 117
+                    - 115
+                    - 46
+                format: byte
+        example:
+            content_type: "multipart/\U000424B4\U0006A387\U00069232\U000DC09E; boundary=����"
+            image:
+                - 79
+                - 109
+                - 110
+                - 105
+                - 115
+                - 32
+                - 105
+                - 112
+                - 115
+                - 97
+                - 32
+                - 100
+                - 111
+                - 108
+                - 111
+                - 114
+                - 101
+                - 115
+                - 32
+                - 114
+                - 101
+                - 99
+                - 117
+                - 115
+                - 97
+                - 110
+                - 100
+                - 97
+                - 101
+                - 32
+                - 114
+                - 101
+                - 105
+                - 99
+                - 105
+                - 101
+                - 110
+                - 100
+                - 105
+                - 115
+                - 32
+                - 116
+                - 111
+                - 116
+                - 97
+                - 109
+                - 46
     BooksUploadInternalErrorResponseBody:
         title: 'Mediatype identifier: application/vnd.goa.error; view=default'
         type: object

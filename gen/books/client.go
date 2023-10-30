@@ -16,23 +16,25 @@ import (
 
 // Client is the "books" service client.
 type Client struct {
-	CreateEndpoint     goa.Endpoint
-	AllEndpoint        goa.Endpoint
-	UpdateBookEndpoint goa.Endpoint
-	GetBookEndpoint    goa.Endpoint
-	DeleteBookEndpoint goa.Endpoint
-	UploadEndpoint     goa.Endpoint
+	CreateEndpoint      goa.Endpoint
+	AllEndpoint         goa.Endpoint
+	UpdateBookEndpoint  goa.Endpoint
+	GetBookEndpoint     goa.Endpoint
+	DeleteBookEndpoint  goa.Endpoint
+	UploadEndpoint      goa.Endpoint
+	UploadImageEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "books" service client given the endpoints.
-func NewClient(create, all, updateBook, getBook, deleteBook, upload goa.Endpoint) *Client {
+func NewClient(create, all, updateBook, getBook, deleteBook, upload, uploadImage goa.Endpoint) *Client {
 	return &Client{
-		CreateEndpoint:     create,
-		AllEndpoint:        all,
-		UpdateBookEndpoint: updateBook,
-		GetBookEndpoint:    getBook,
-		DeleteBookEndpoint: deleteBook,
-		UploadEndpoint:     upload,
+		CreateEndpoint:      create,
+		AllEndpoint:         all,
+		UpdateBookEndpoint:  updateBook,
+		GetBookEndpoint:     getBook,
+		DeleteBookEndpoint:  deleteBook,
+		UploadEndpoint:      upload,
+		UploadImageEndpoint: uploadImage,
 	}
 }
 
@@ -90,5 +92,11 @@ func (c *Client) DeleteBook(ctx context.Context, p *DeleteBookPayload) (err erro
 //   - error: internal error
 func (c *Client) Upload(ctx context.Context, p *UploadPayload, req io.ReadCloser) (err error) {
 	_, err = c.UploadEndpoint(ctx, &UploadRequestData{Payload: p, Body: req})
+	return
+}
+
+// UploadImage calls the "uploadImage" endpoint of the "books" service.
+func (c *Client) UploadImage(ctx context.Context, p *UploadImagePayload) (err error) {
+	_, err = c.UploadImageEndpoint(ctx, p)
 	return
 }

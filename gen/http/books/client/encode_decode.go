@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
@@ -495,15 +496,90 @@ func BuildUploadStreamPayload(payload any, fpath string) (*books.UploadRequestDa
 	}, nil
 }
 
+// BuildUploadImageRequest instantiates a HTTP request object with method and
+// path set to call the "books" service "uploadImage" endpoint
+func (c *Client) BuildUploadImageRequest(ctx context.Context, v any) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadImageBooksPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("books", "uploadImage", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUploadImageRequest returns an encoder for requests sent to the books
+// uploadImage server.
+func EncodeUploadImageRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, any) error {
+	return func(req *http.Request, v any) error {
+		p, ok := v.(*books.UploadImagePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("books", "uploadImage", "*books.UploadImagePayload", v)
+		}
+		if err := encoder(req).Encode(p); err != nil {
+			return goahttp.ErrEncodingError("books", "uploadImage", err)
+		}
+		return nil
+	}
+}
+
+// NewBooksUploadImageEncoder returns an encoder to encode the multipart
+// request for the "books" service "uploadImage" endpoint.
+func NewBooksUploadImageEncoder(encoderFn BooksUploadImageEncoderFunc) func(r *http.Request) goahttp.Encoder {
+	return func(r *http.Request) goahttp.Encoder {
+		body := &bytes.Buffer{}
+		mw := multipart.NewWriter(body)
+		return goahttp.EncodingFunc(func(v any) error {
+			p := v.(*books.UploadImagePayload)
+			if err := encoderFn(mw, p); err != nil {
+				return err
+			}
+			r.Body = io.NopCloser(body)
+			r.Header.Set("Content-Type", mw.FormDataContentType())
+			return mw.Close()
+		})
+	}
+}
+
+// DecodeUploadImageResponse returns a decoder for responses returned by the
+// books uploadImage endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+func DecodeUploadImageResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (any, error) {
+	return func(resp *http.Response) (any, error) {
+		if restoreBody {
+			b, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = io.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		default:
+			body, _ := io.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("books", "uploadImage", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalBookResponseToBooksBook builds a value of type *books.Book from a
 // value of type *BookResponse.
 func unmarshalBookResponseToBooksBook(v *BookResponse) *books.Book {
 	res := &books.Book{
 		ID:          v.ID,
-		Title:       *&v.Title,
-		Author:      *&v.Author,
-		BookCover:   *&v.BookCover,
-		PublishedAt: *&v.PublishedAt,
+		Title:       *v.Title,
+		Author:      *v.Author,
+		BookCover:   *v.BookCover,
+		PublishedAt: *v.PublishedAt,
 	}
 
 	return res
@@ -517,10 +593,10 @@ func marshalBooksBookToBookRequestBody(v *books.Book) *BookRequestBody {
 	}
 	res := &BookRequestBody{
 		ID:          v.ID,
-		Title:       *v.Title,
-		Author:      *v.Author,
-		BookCover:   *v.BookCover,
-		PublishedAt: *v.PublishedAt,
+		Title:       v.Title,
+		Author:      v.Author,
+		BookCover:   v.BookCover,
+		PublishedAt: v.PublishedAt,
 	}
 
 	return res
@@ -534,10 +610,10 @@ func marshalBookRequestBodyToBooksBook(v *BookRequestBody) *books.Book {
 	}
 	res := &books.Book{
 		ID:          v.ID,
-		Title:       &v.Title,
-		Author:      &v.Author,
-		BookCover:   &v.BookCover,
-		PublishedAt: &v.PublishedAt,
+		Title:       v.Title,
+		Author:      v.Author,
+		BookCover:   v.BookCover,
+		PublishedAt: v.PublishedAt,
 	}
 
 	return res

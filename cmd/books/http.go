@@ -1,6 +1,7 @@
 package main
 
 import (
+	booksapi "books"
 	books "books/gen/books"
 	bookssvr "books/gen/http/books/server"
 	"context"
@@ -53,7 +54,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, booksEndpoints *books.End
 	)
 	{
 		eh := errorHandler(logger)
-		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, nil)
+		booksServer = bookssvr.New(booksEndpoints, mux, dec, enc, eh, nil, booksapi.BooksUploadImageDecoderFunc, nil)
 		if debug {
 			servers := goahttp.Servers{
 				booksServer,

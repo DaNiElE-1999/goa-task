@@ -289,15 +289,55 @@ func EncodeUploadError(encoder func(context.Context, http.ResponseWriter) goahtt
 	}
 }
 
+// EncodeUploadImageResponse returns an encoder for responses returned by the
+// books uploadImage endpoint.
+func EncodeUploadImageResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, any) error {
+	return func(ctx context.Context, w http.ResponseWriter, v any) error {
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// DecodeUploadImageRequest returns a decoder for requests sent to the books
+// uploadImage endpoint.
+func DecodeUploadImageRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (any, error) {
+	return func(r *http.Request) (any, error) {
+		var payload *books.UploadImagePayload
+		if err := decoder(r).Decode(&payload); err != nil {
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+
+		return payload, nil
+	}
+}
+
+// NewBooksUploadImageDecoder returns a decoder to decode the multipart request
+// for the "books" service "uploadImage" endpoint.
+func NewBooksUploadImageDecoder(mux goahttp.Muxer, booksUploadImageDecoderFn BooksUploadImageDecoderFunc) func(r *http.Request) goahttp.Decoder {
+	return func(r *http.Request) goahttp.Decoder {
+		return goahttp.EncodingFunc(func(v any) error {
+			mr, merr := r.MultipartReader()
+			if merr != nil {
+				return merr
+			}
+			p := v.(**books.UploadImagePayload)
+			if err := booksUploadImageDecoderFn(mr, p); err != nil {
+				return err
+			}
+			return nil
+		})
+	}
+}
+
 // marshalBooksBookToBookResponse builds a value of type *BookResponse from a
 // value of type *books.Book.
 func marshalBooksBookToBookResponse(v *books.Book) *BookResponse {
 	res := &BookResponse{
 		ID:          v.ID,
-		Title:       *v.Title,
-		Author:      *v.Author,
-		BookCover:   *v.BookCover,
-		PublishedAt: *v.PublishedAt,
+		Title:       v.Title,
+		Author:      v.Author,
+		BookCover:   v.BookCover,
+		PublishedAt: v.PublishedAt,
 	}
 
 	return res
@@ -311,10 +351,10 @@ func unmarshalBookRequestBodyToBooksBook(v *BookRequestBody) *books.Book {
 	}
 	res := &books.Book{
 		ID:          v.ID,
-		Title:       *&v.Title,
-		Author:      *&v.Author,
-		BookCover:   *&v.BookCover,
-		PublishedAt: *&v.PublishedAt,
+		Title:       *v.Title,
+		Author:      *v.Author,
+		BookCover:   *v.BookCover,
+		PublishedAt: *v.PublishedAt,
 	}
 
 	return res

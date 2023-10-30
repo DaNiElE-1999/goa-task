@@ -10,6 +10,7 @@ package server
 import (
 	books "books/gen/books"
 	"context"
+	"mime/multipart"
 	"net/http"
 
 	goahttp "goa.design/goa/v3/http"
@@ -25,6 +26,7 @@ type Server struct {
 	GetBook             http.Handler
 	DeleteBook          http.Handler
 	Upload              http.Handler
+	UploadImage         http.Handler
 	GenHTTPOpenapi3JSON http.Handler
 }
 
@@ -39,6 +41,10 @@ type MountPoint struct {
 	Pattern string
 }
 
+// BooksUploadImageDecoderFunc is the type to decode multipart request for the
+// "books" service "uploadImage" endpoint.
+type BooksUploadImageDecoderFunc func(*multipart.Reader, **books.UploadImagePayload) error
+
 // New instantiates HTTP handlers for all the books service endpoints using the
 // provided encoder and decoder. The handlers are mounted on the given mux
 // using the HTTP verb and path defined in the design. errhandler is called
@@ -52,6 +58,7 @@ func New(
 	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
 	errhandler func(context.Context, http.ResponseWriter, error),
 	formatter func(ctx context.Context, err error) goahttp.Statuser,
+	booksUploadImageDecoderFn BooksUploadImageDecoderFunc,
 	fileSystemGenHTTPOpenapi3JSON http.FileSystem,
 ) *Server {
 	if fileSystemGenHTTPOpenapi3JSON == nil {
@@ -65,6 +72,7 @@ func New(
 			{"GetBook", "GET", "/books/{id}"},
 			{"DeleteBook", "DELETE", "/books/{id}"},
 			{"Upload", "POST", "/upload/{*dir}"},
+			{"UploadImage", "POST", "/uploadBookCover"},
 			{"./gen/http/openapi3.json", "GET", "/openapi3.json"},
 		},
 		Create:              NewCreateHandler(e.Create, mux, decoder, encoder, errhandler, formatter),
@@ -73,6 +81,7 @@ func New(
 		GetBook:             NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
 		DeleteBook:          NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
 		Upload:              NewUploadHandler(e.Upload, mux, decoder, encoder, errhandler, formatter),
+		UploadImage:         NewUploadImageHandler(e.UploadImage, mux, NewBooksUploadImageDecoder(mux, booksUploadImageDecoderFn), encoder, errhandler, formatter),
 		GenHTTPOpenapi3JSON: http.FileServer(fileSystemGenHTTPOpenapi3JSON),
 	}
 }
@@ -88,6 +97,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetBook = m(s.GetBook)
 	s.DeleteBook = m(s.DeleteBook)
 	s.Upload = m(s.Upload)
+	s.UploadImage = m(s.UploadImage)
 }
 
 // MethodNames returns the methods served.
@@ -101,6 +111,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetBookHandler(mux, h.GetBook)
 	MountDeleteBookHandler(mux, h.DeleteBook)
 	MountUploadHandler(mux, h.Upload)
+	MountUploadImageHandler(mux, h.UploadImage)
 	MountGenHTTPOpenapi3JSON(mux, goahttp.Replace("", "/./gen/http/openapi3.json", h.GenHTTPOpenapi3JSON))
 }
 
@@ -397,6 +408,57 @@ func NewUploadHandler(
 		}
 		data := &books.UploadRequestData{Payload: payload.(*books.UploadPayload), Body: r.Body}
 		res, err := endpoint(ctx, data)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountUploadImageHandler configures the mux to serve the "books" service
+// "uploadImage" endpoint.
+func MountUploadImageHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := h.(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/uploadBookCover", f)
+}
+
+// NewUploadImageHandler creates a HTTP handler which loads the HTTP request
+// and calls the "books" service "uploadImage" endpoint.
+func NewUploadImageHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(ctx context.Context, err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUploadImageRequest(mux, decoder)
+		encodeResponse = EncodeUploadImageResponse(encoder)
+		encodeError    = goahttp.ErrorEncoder(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "uploadImage")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "books")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

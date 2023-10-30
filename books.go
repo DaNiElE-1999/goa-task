@@ -2,18 +2,18 @@ package booksapi
 
 import (
 	books "books/gen/books"
+	"bytes"
 	context "context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"io"
 	"log"
-	"mime"
-	"mime/multipart"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -69,12 +69,33 @@ func (s *bookssrvc) executeQuery(query string, args ...interface{}) error {
 	return err
 }
 
+// UploadImage implements the upload image functionality
+func (s *bookssrvc) UploadImage(ctx context.Context, p *books.UploadImagePayload) (err error) {
+	// Generate a unique filename for the image
+	filename := filepath.Join("public/images", fmt.Sprintf("%d.png", time.Now().UnixNano()))
+
+	// Create a new file in the images directory
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Write the image data to the file
+	_, err = io.Copy(file, bytes.NewReader(p.Image))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Create implements create.
 func (s *bookssrvc) Create(ctx context.Context, p *books.Book) (res *books.Book, err error) {
 	s.logger.Print("books.create")
 
 	// Validate the date format
-	if p.PublishedAt != nil && !isValidDateFormat(*p.PublishedAt) {
+	if &p.PublishedAt != nil && !isValidDateFormat(p.PublishedAt) {
 		return nil, ErrInvalidDateFormat
 	}
 
@@ -82,7 +103,7 @@ func (s *bookssrvc) Create(ctx context.Context, p *books.Book) (res *books.Book,
 	insertQuery := "INSERT INTO books (Title, Author, BookCover, PublishedAt) VALUES (?, ?, ?, ?)"
 
 	// Execute the query using the reusable function
-	if err := s.executeQuery(insertQuery, *p.Title, *p.Author, *p.BookCover, *p.PublishedAt); err != nil {
+	if err := s.executeQuery(insertQuery, p.Title, p.Author, p.BookCover, p.PublishedAt); err != nil {
 		return nil, err
 	}
 
@@ -126,7 +147,7 @@ func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) 
 	s.logger.Print("books.updateBook")
 
 	// Validate the date format
-	if p.Book.PublishedAt != nil && !isValidDateFormat(*p.Book.PublishedAt) {
+	if &p.Book.PublishedAt != nil && !isValidDateFormat(p.Book.PublishedAt) {
 		return nil, ErrInvalidDateFormat
 	}
 
@@ -137,27 +158,27 @@ func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) 
 	var args []interface{}
 
 	// Check if the payload contains a title update
-	if p.Book.Title != nil {
+	if &p.Book.Title != nil {
 		setClauses = append(setClauses, "Title = ?")
-		args = append(args, *p.Book.Title)
+		args = append(args, p.Book.Title)
 	}
 
 	// Check if the payload contains an author update
-	if p.Book.Author != nil {
+	if &p.Book.Author != nil {
 		setClauses = append(setClauses, "Author = ?")
-		args = append(args, *p.Book.Author)
+		args = append(args, p.Book.Author)
 	}
 
 	// Check if the payload contains a bookCover update
-	if p.Book.BookCover != nil {
+	if &p.Book.BookCover != nil {
 		setClauses = append(setClauses, "BookCover = ?")
-		args = append(args, *p.Book.BookCover)
+		args = append(args, p.Book.BookCover)
 	}
 
 	// Check if the payload contains a publishedAt update
-	if p.Book.PublishedAt != nil {
+	if &p.Book.PublishedAt != nil {
 		setClauses = append(setClauses, "PublishedAt = ?")
-		args = append(args, *p.Book.PublishedAt)
+		args = append(args, p.Book.PublishedAt)
 	}
 
 	// Add the ID for the WHERE clause
@@ -216,101 +237,7 @@ func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) 
 	return nil
 }
 
-// Upload implements file upload.
-// func (s *bookssrvc) Upload(ctx context.Context, p *books.UploadPayload, req io.ReadCloser) error {
-// 	defer req.Close() // Close the request body when done
-
-// 	// Ensure the upload directory exists
-// 	uploadDir := filepath.Join(s.dir, p.Dir)
-// 	if err := os.MkdirAll(uploadDir, 0777); err != nil {
-// 		return books.MakeInternalError(err)
-// 	}
-
-// 	s.logger.Printf("Upload directory: %s\n", uploadDir)
-
-// 	// Create a multipart request reader
-// 	_, params, err := mime.ParseMediaType(p.ContentType)
-// 	if err != nil {
-// 		return books.MakeInvalidMediaType(err)
-// 	}
-// 	mr := multipart.NewReader(req, params["boundary"])
-
-// 	// Process each part of the multipart request
-// 	for {
-// 		part, err := mr.NextPart()
-// 		if err == io.EOF {
-// 			// No more parts, we're done!
-// 			return nil
-// 		}
-// 		if err != nil {
-// 			return books.MakeInvalidMultipartRequest(err)
-// 		}
-
-// 		// Create the uploaded file, potentially overwriting an existing file
-// 		fpath := filepath.Join(uploadDir, part.FileName())
-// 		f, err := os.Create(fpath)
-// 		if err != nil {
-// 			return books.MakeInternalError(err)
-// 		}
-// 		defer f.Close() // Close the file when done
-
-// 		// Stream content to the disk
-// 		n, copyErr := io.Copy(f, part)
-// 		if copyErr != nil {
-// 			return books.MakeInternalError(copyErr)
-// 		}
-// 		s.logger.Printf("Written %d bytes to %q", n, fpath)
-// 	}
-// }
-
 // Upload implements upload.
 func (s *bookssrvc) Upload(ctx context.Context, p *books.UploadPayload, req io.ReadCloser) error {
-	// Don't forget to close the body reader!
-	defer req.Close()
-
-	s.logger.Print(s.dir)
-	s.logger.Print(p.Dir)
-
-	// Make sure upload directory exists
-	uploadDir := filepath.Join(s.dir, p.Dir)
-	if err := os.MkdirAll(uploadDir, 0777); err != nil {
-		return books.MakeInternalError(err)
-	}
-
-	// Createa multipart request reader
-	_, params, err := mime.ParseMediaType(p.ContentType)
-	if err != nil {
-		return books.MakeInvalidMediaType(err)
-	}
-	mr := multipart.NewReader(req, params["boundary"])
-
-	fmt.Printf("mr: %v\n", mr)
-
-	//Go through each part and save the corresponding content to disk.
-	for {
-		part, err := mr.NextPart()
-		if err == io.EOF {
-			// We're done!
-			return nil
-		}
-		if err != nil {
-			return books.MakeInvalidMultipartRequest(err)
-		}
-
-		// Create uploaded file, potentially overridding existing file.
-		fpath := filepath.Join(uploadDir, part.FileName())
-		f, err := os.Create(fpath)
-		if err != nil {
-			return books.MakeInternalError(err)
-		}
-		defer f.Close()
-
-		// Stream content to disk.
-		n, err := io.Copy(f, part)
-		if err != nil {
-			return books.MakeInternalError(err)
-		}
-		s.logger.Printf("Written %d bytes to %q", n, fpath)
-	}
-
+	return nil
 }

@@ -8,7 +8,9 @@
 package client
 
 import (
+	books "books/gen/books"
 	"context"
+	"mime/multipart"
 	"net/http"
 
 	goahttp "goa.design/goa/v3/http"
@@ -38,6 +40,10 @@ type Client struct {
 	// Upload Doer is the HTTP client used to make requests to the upload endpoint.
 	UploadDoer goahttp.Doer
 
+	// UploadImage Doer is the HTTP client used to make requests to the uploadImage
+	// endpoint.
+	UploadImageDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -47,6 +53,10 @@ type Client struct {
 	encoder func(*http.Request) goahttp.Encoder
 	decoder func(*http.Response) goahttp.Decoder
 }
+
+// BooksUploadImageEncoderFunc is the type to encode multipart request for the
+// "books" service "uploadImage" endpoint.
+type BooksUploadImageEncoderFunc func(*multipart.Writer, *books.UploadImagePayload) error
 
 // NewClient instantiates HTTP clients for all the books service servers.
 func NewClient(
@@ -64,6 +74,7 @@ func NewClient(
 		GetBookDoer:         doer,
 		DeleteBookDoer:      doer,
 		UploadDoer:          doer,
+		UploadImageDoer:     doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -196,6 +207,30 @@ func (c *Client) Upload() goa.Endpoint {
 		resp, err := c.UploadDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("books", "upload", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UploadImage returns an endpoint that makes HTTP requests to the books
+// service uploadImage server.
+func (c *Client) UploadImage(booksUploadImageEncoderFn BooksUploadImageEncoderFunc) goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUploadImageRequest(NewBooksUploadImageEncoder(booksUploadImageEncoderFn))
+		decodeResponse = DecodeUploadImageResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v any) (any, error) {
+		req, err := c.BuildUploadImageRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UploadImageDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("books", "uploadImage", err)
 		}
 		return decodeResponse(resp)
 	}

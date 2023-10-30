@@ -16,12 +16,13 @@ import (
 
 // Endpoints wraps the "books" service endpoints.
 type Endpoints struct {
-	Create     goa.Endpoint
-	All        goa.Endpoint
-	UpdateBook goa.Endpoint
-	GetBook    goa.Endpoint
-	DeleteBook goa.Endpoint
-	Upload     goa.Endpoint
+	Create      goa.Endpoint
+	All         goa.Endpoint
+	UpdateBook  goa.Endpoint
+	GetBook     goa.Endpoint
+	DeleteBook  goa.Endpoint
+	Upload      goa.Endpoint
+	UploadImage goa.Endpoint
 }
 
 // UploadRequestData holds both the payload and the HTTP request body reader of
@@ -36,12 +37,13 @@ type UploadRequestData struct {
 // NewEndpoints wraps the methods of the "books" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Create:     NewCreateEndpoint(s),
-		All:        NewAllEndpoint(s),
-		UpdateBook: NewUpdateBookEndpoint(s),
-		GetBook:    NewGetBookEndpoint(s),
-		DeleteBook: NewDeleteBookEndpoint(s),
-		Upload:     NewUploadEndpoint(s),
+		Create:      NewCreateEndpoint(s),
+		All:         NewAllEndpoint(s),
+		UpdateBook:  NewUpdateBookEndpoint(s),
+		GetBook:     NewGetBookEndpoint(s),
+		DeleteBook:  NewDeleteBookEndpoint(s),
+		Upload:      NewUploadEndpoint(s),
+		UploadImage: NewUploadImageEndpoint(s),
 	}
 }
 
@@ -53,6 +55,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetBook = m(e.GetBook)
 	e.DeleteBook = m(e.DeleteBook)
 	e.Upload = m(e.Upload)
+	e.UploadImage = m(e.UploadImage)
 }
 
 // NewCreateEndpoint returns an endpoint function that calls the method
@@ -105,5 +108,14 @@ func NewUploadEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req any) (any, error) {
 		ep := req.(*UploadRequestData)
 		return nil, s.Upload(ctx, ep.Payload, ep.Body)
+	}
+}
+
+// NewUploadImageEndpoint returns an endpoint function that calls the method
+// "uploadImage" of service "books".
+func NewUploadImageEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req any) (any, error) {
+		p := req.(*UploadImagePayload)
+		return nil, s.UploadImage(ctx, p)
 	}
 }

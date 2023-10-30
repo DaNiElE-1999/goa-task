@@ -1,6 +1,7 @@
 package main
 
 import (
+	books "books"
 	cli "books/gen/http/cli/books"
 	"net/http"
 	"time"
@@ -27,6 +28,7 @@ func doHTTP(scheme, host string, timeout int, debug bool) (goa.Endpoint, any, er
 		goahttp.RequestEncoder,
 		goahttp.ResponseDecoder,
 		debug,
+		books.BooksUploadImageEncoderFunc,
 	)
 }
 

@@ -22,18 +22,18 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `books (create|all|update-book|get-book|delete-book|upload)
+	return `books (create|all|update-book|get-book|delete-book|upload|upload-image)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` books create --body '{
-      "ID": 4527815212959476002,
-      "author": "Sunt ut sint accusamus.",
-      "bookCover": "Omnis molestiae sed.",
-      "publishedAt": "In optio dolor sed quo porro.",
-      "title": "Ipsam sed."
+      "ID": 8956346360473798852,
+      "author": "Omnis molestiae sed.",
+      "bookCover": "In optio dolor sed quo porro.",
+      "publishedAt": "Natus magni laborum.",
+      "title": "Sunt ut sint accusamus."
    }'` + "\n" +
 		""
 }
@@ -46,6 +46,7 @@ func ParseEndpoint(
 	enc func(*http.Request) goahttp.Encoder,
 	dec func(*http.Response) goahttp.Decoder,
 	restore bool,
+	booksUploadImageEncoderFn booksc.BooksUploadImageEncoderFunc,
 ) (goa.Endpoint, any, error) {
 	var (
 		booksFlags = flag.NewFlagSet("books", flag.ContinueOnError)
@@ -69,6 +70,9 @@ func ParseEndpoint(
 		booksUploadDirFlag         = booksUploadFlags.String("dir", "REQUIRED", "Dir is the relative path to the file directory where the uploaded content is saved.")
 		booksUploadContentTypeFlag = booksUploadFlags.String("content-type", "multipart/form-data; boundary=goa", "")
 		booksUploadStreamFlag      = booksUploadFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
+
+		booksUploadImageFlags    = flag.NewFlagSet("upload-image", flag.ExitOnError)
+		booksUploadImageBodyFlag = booksUploadImageFlags.String("body", "REQUIRED", "")
 	)
 	booksFlags.Usage = booksUsage
 	booksCreateFlags.Usage = booksCreateUsage
@@ -77,6 +81,7 @@ func ParseEndpoint(
 	booksGetBookFlags.Usage = booksGetBookUsage
 	booksDeleteBookFlags.Usage = booksDeleteBookUsage
 	booksUploadFlags.Usage = booksUploadUsage
+	booksUploadImageFlags.Usage = booksUploadImageUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -130,6 +135,9 @@ func ParseEndpoint(
 			case "upload":
 				epf = booksUploadFlags
 
+			case "upload-image":
+				epf = booksUploadImageFlags
+
 			}
 
 		}
@@ -176,6 +184,9 @@ func ParseEndpoint(
 				if err == nil {
 					data, err = booksc.BuildUploadStreamPayload(data, *booksUploadStreamFlag)
 				}
+			case "upload-image":
+				endpoint = c.UploadImage(booksUploadImageEncoderFn)
+				data, err = booksc.BuildUploadImagePayload(*booksUploadImageBodyFlag)
 			}
 		}
 	}
@@ -199,6 +210,7 @@ COMMAND:
     get-book: GetBook implements getBook.
     delete-book: DeleteBook implements deleteBook.
     upload: Upload implements upload.
+    upload-image: Upload an image
 
 Additional help:
     %[1]s books COMMAND --help
@@ -212,11 +224,11 @@ Create implements create.
 
 Example:
     %[1]s books create --body '{
-      "ID": 4527815212959476002,
-      "author": "Sunt ut sint accusamus.",
-      "bookCover": "Omnis molestiae sed.",
-      "publishedAt": "In optio dolor sed quo porro.",
-      "title": "Ipsam sed."
+      "ID": 8956346360473798852,
+      "author": "Omnis molestiae sed.",
+      "bookCover": "In optio dolor sed quo porro.",
+      "publishedAt": "Natus magni laborum.",
+      "title": "Sunt ut sint accusamus."
    }'
 `, os.Args[0])
 }
@@ -241,13 +253,13 @@ UpdateBook implements updateBook.
 Example:
     %[1]s books update-book --body '{
       "book": {
-         "ID": 4940795916846100831,
-         "author": "Eum maiores maxime.",
-         "bookCover": "Non dolores quasi saepe sunt est dolor.",
-         "publishedAt": "Expedita commodi facere magni et.",
-         "title": "Eos consequuntur tempore."
+         "ID": 267326349154593595,
+         "author": "Expedita commodi facere magni et.",
+         "bookCover": "Est quibusdam rerum.",
+         "publishedAt": "Dolor labore.",
+         "title": "Quasi saepe sunt est dolor."
       }
-   }' --id 7004976670955238273
+   }' --id 4100618768479025547
 `, os.Args[0])
 }
 
@@ -258,7 +270,7 @@ GetBook implements getBook.
     -id INT: Book ID
 
 Example:
-    %[1]s books get-book --id 8779549259451125819
+    %[1]s books get-book --id 59846324385193270
 `, os.Args[0])
 }
 
@@ -269,7 +281,7 @@ DeleteBook implements deleteBook.
     -id INT: Book ID
 
 Example:
-    %[1]s books delete-book --id 7531440421541391582
+    %[1]s books delete-book --id 2664162758254312699
 `, os.Args[0])
 }
 
@@ -283,5 +295,19 @@ Upload implements upload.
 
 Example:
     %[1]s books upload --dir "upload" --content-type "multipart/form-data; boundary=goa" --stream "goa.png"
+`, os.Args[0])
+}
+
+func booksUploadImageUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] books upload-image -body JSON
+
+Upload an image
+    -body JSON: 
+
+Example:
+    %[1]s books upload-image --body '{
+      "content_type": "multipart/󇍽鰒𩴿; boundary=�����",
+      "image": "RXQgc2ludCBjb25zZXF1dW50dXIgdXQgYWxpYXMgZW9zLg=="
+   }'
 `, os.Args[0])
 }

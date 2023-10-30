@@ -76,40 +76,19 @@ var _ = Service("books", func() {
 		})
 	})
 
-	Method("upload", func() {
-
-		// The payload defines the request headers and parameters. It cannot
-		// define body attributes as the endpoint makes use of
-		// SkipRequestBodyEncodeDecode.
+	Method("uploadImage", func() {
+		Description("Upload an image")
 		Payload(func() {
+			Attribute("image", Bytes, "Binary data of the image")
 			Attribute("content_type", String, "Content-Type header, must define value for multipart boundary.", func() {
 				Default("multipart/form-data; boundary=goa")
 				Pattern("multipart/[^;]+; boundary=.+")
-				Example("multipart/form-data; boundary=goa")
-			})
-			Attribute("dir", String, "Dir is the relative path to the file directory where the uploaded content is saved.", func() {
-				Default("upload")
-				Example("upload")
 			})
 		})
-
-		Error("invalid_media_type", ErrorResult, "Error returned when the Content-Type header does not define a multipart request.")
-		Error("invalid_multipart_request", ErrorResult, "Error returned when the request body is not a valid multipart content.")
-		Error("internal_error", ErrorResult, "Fault while processing upload.")
-
 		HTTP(func() {
-			POST("/upload/{*dir}")
-			Header("content_type:Content-Type")
-
-			// Bypass request body decoder code generation to alleviate need for
-			// loading the entire request body in memory. The service gets
-			// direct access to the HTTP request body reader.
-			SkipRequestBodyEncodeDecode()
-
-			// Define error HTTP statuses.
-			Response("invalid_media_type", StatusBadRequest)
-			Response("invalid_multipart_request", StatusBadRequest)
-			Response("internal_error", StatusInternalServerError)
+			POST("/uploadBookCover")
+			MultipartRequest()
+			Response(StatusOK)
 		})
 	})
 

@@ -24,15 +24,15 @@ func BuildCreatePayload(booksCreateBody string) (*books.Book, error) {
 	{
 		err = json.Unmarshal([]byte(booksCreateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"ID\": 4527815212959476002,\n      \"author\": \"Sunt ut sint accusamus.\",\n      \"bookCover\": \"Omnis molestiae sed.\",\n      \"publishedAt\": \"In optio dolor sed quo porro.\",\n      \"title\": \"Ipsam sed.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"ID\": 8956346360473798852,\n      \"author\": \"Omnis molestiae sed.\",\n      \"bookCover\": \"In optio dolor sed quo porro.\",\n      \"publishedAt\": \"Natus magni laborum.\",\n      \"title\": \"Sunt ut sint accusamus.\"\n   }'")
 		}
 	}
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       &body.Title,
-		Author:      &body.Author,
-		BookCover:   &body.BookCover,
-		PublishedAt: &body.PublishedAt,
+		Title:       body.Title,
+		Author:      body.Author,
+		BookCover:   body.BookCover,
+		PublishedAt: body.PublishedAt,
 	}
 
 	return v, nil
@@ -46,7 +46,7 @@ func BuildUpdateBookPayload(booksUpdateBookBody string, booksUpdateBookID string
 	{
 		err = json.Unmarshal([]byte(booksUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"book\": {\n         \"ID\": 4940795916846100831,\n         \"author\": \"Eum maiores maxime.\",\n         \"bookCover\": \"Non dolores quasi saepe sunt est dolor.\",\n         \"publishedAt\": \"Expedita commodi facere magni et.\",\n         \"title\": \"Eos consequuntur tempore.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"book\": {\n         \"ID\": 267326349154593595,\n         \"author\": \"Expedita commodi facere magni et.\",\n         \"bookCover\": \"Est quibusdam rerum.\",\n         \"publishedAt\": \"Dolor labore.\",\n         \"title\": \"Quasi saepe sunt est dolor.\"\n      }\n   }'")
 		}
 	}
 	var id int
@@ -126,6 +126,31 @@ func BuildUploadPayload(booksUploadDir string, booksUploadContentType string) (*
 	v := &books.UploadPayload{}
 	v.Dir = dir
 	v.ContentType = contentType
+
+	return v, nil
+}
+
+// BuildUploadImagePayload builds the payload for the books uploadImage
+// endpoint from CLI flags.
+func BuildUploadImagePayload(booksUploadImageBody string) (*books.UploadImagePayload, error) {
+	var err error
+	var body UploadImageRequestBody
+	{
+		err = json.Unmarshal([]byte(booksUploadImageBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"content_type\": \"multipart/\U000c737d鰒𩴿; boundary=�����\",\n      \"image\": \"RXQgc2ludCBjb25zZXF1dW50dXIgdXQgYWxpYXMgZW9zLg==\"\n   }'")
+		}
+	}
+	v := &books.UploadImagePayload{
+		Image:       body.Image,
+		ContentType: body.ContentType,
+	}
+	{
+		var zero string
+		if v.ContentType == zero {
+			v.ContentType = "multipart/form-data; boundary=goa"
+		}
+	}
 
 	return v, nil
 }

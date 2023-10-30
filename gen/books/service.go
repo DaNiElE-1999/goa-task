@@ -28,6 +28,8 @@ type Service interface {
 	DeleteBook(context.Context, *DeleteBookPayload) (err error)
 	// Upload implements upload.
 	Upload(context.Context, *UploadPayload, io.ReadCloser) (err error)
+	// Upload an image
+	UploadImage(context.Context, *UploadImagePayload) (err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -38,20 +40,20 @@ const ServiceName = "books"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"create", "all", "updateBook", "getBook", "deleteBook", "upload"}
+var MethodNames = [7]string{"create", "all", "updateBook", "getBook", "deleteBook", "upload", "uploadImage"}
 
 // Book is the payload type of the books service create method.
 type Book struct {
 	// Unique ID of the book
 	ID *int
 	// Title of the book
-	Title *string
+	Title string
 	// Author of the book
-	Author *string
+	Author string
 	// Cover of the book
-	BookCover *string
+	BookCover string
 	// Date the book has been published
-	PublishedAt *string
+	PublishedAt string
 }
 
 // DeleteBookPayload is the payload type of the books service deleteBook method.
@@ -71,6 +73,15 @@ type UpdateBookPayload struct {
 	// Book ID
 	ID   *int
 	Book *Book
+}
+
+// UploadImagePayload is the payload type of the books service uploadImage
+// method.
+type UploadImagePayload struct {
+	// Binary data of the image
+	Image []byte
+	// Content-Type header, must define value for multipart boundary.
+	ContentType string
 }
 
 // UploadPayload is the payload type of the books service upload method.

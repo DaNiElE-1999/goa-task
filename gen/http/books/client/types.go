@@ -34,6 +34,15 @@ type UpdateBookRequestBody struct {
 	Book *BookRequestBody `form:"book,omitempty" json:"book,omitempty" xml:"book,omitempty"`
 }
 
+// UploadImageRequestBody is the type of the "books" service "uploadImage"
+// endpoint HTTP request body.
+type UploadImageRequestBody struct {
+	// Binary data of the image
+	Image []byte `form:"image,omitempty" json:"image,omitempty" xml:"image,omitempty"`
+	// Content-Type header, must define value for multipart boundary.
+	ContentType string `form:"content_type" json:"content_type" xml:"content_type"`
+}
+
 // CreateResponseBody is the type of the "books" service "create" endpoint HTTP
 // response body.
 type CreateResponseBody struct {
@@ -171,10 +180,10 @@ type BookRequestBody struct {
 func NewCreateRequestBody(p *books.Book) *CreateRequestBody {
 	body := &CreateRequestBody{
 		ID:          p.ID,
-		Title:       *p.Title,
-		Author:      *p.Author,
-		BookCover:   *p.BookCover,
-		PublishedAt: *p.PublishedAt,
+		Title:       p.Title,
+		Author:      p.Author,
+		BookCover:   p.BookCover,
+		PublishedAt: p.PublishedAt,
 	}
 	return body
 }
@@ -189,15 +198,31 @@ func NewUpdateBookRequestBody(p *books.UpdateBookPayload) *UpdateBookRequestBody
 	return body
 }
 
+// NewUploadImageRequestBody builds the HTTP request body from the payload of
+// the "uploadImage" endpoint of the "books" service.
+func NewUploadImageRequestBody(p *books.UploadImagePayload) *UploadImageRequestBody {
+	body := &UploadImageRequestBody{
+		Image:       p.Image,
+		ContentType: p.ContentType,
+	}
+	{
+		var zero string
+		if body.ContentType == zero {
+			body.ContentType = "multipart/form-data; boundary=goa"
+		}
+	}
+	return body
+}
+
 // NewCreateBookOK builds a "books" service "create" endpoint result from a
 // HTTP "OK" response.
 func NewCreateBookOK(body *CreateResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       *&body.Title,
-		Author:      *&body.Author,
-		BookCover:   *&body.BookCover,
-		PublishedAt: *&body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v
@@ -219,10 +244,10 @@ func NewAllBookOK(body []*BookResponse) []*books.Book {
 func NewUpdateBookBookOK(body *UpdateBookResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       *&body.Title,
-		Author:      *&body.Author,
-		BookCover:   *&body.BookCover,
-		PublishedAt: *&body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v
@@ -233,10 +258,10 @@ func NewUpdateBookBookOK(body *UpdateBookResponseBody) *books.Book {
 func NewGetBookBookOK(body *GetBookResponseBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       *&body.Title,
-		Author:      *&body.Author,
-		BookCover:   *&body.BookCover,
-		PublishedAt: *&body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v

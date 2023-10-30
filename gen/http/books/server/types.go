@@ -34,6 +34,15 @@ type UpdateBookRequestBody struct {
 	Book *BookRequestBody `form:"book,omitempty" json:"book,omitempty" xml:"book,omitempty"`
 }
 
+// UploadImageRequestBody is the type of the "books" service "uploadImage"
+// endpoint HTTP request body.
+type UploadImageRequestBody struct {
+	// Binary data of the image
+	Image []byte `form:"image,omitempty" json:"image,omitempty" xml:"image,omitempty"`
+	// Content-Type header, must define value for multipart boundary.
+	ContentType *string `form:"content_type,omitempty" json:"content_type,omitempty" xml:"content_type,omitempty"`
+}
+
 // CreateResponseBody is the type of the "books" service "create" endpoint HTTP
 // response body.
 type CreateResponseBody struct {
@@ -171,10 +180,10 @@ type BookRequestBody struct {
 func NewCreateResponseBody(res *books.Book) *CreateResponseBody {
 	body := &CreateResponseBody{
 		ID:          res.ID,
-		Title:       *res.Title,
-		Author:      *res.Author,
-		BookCover:   *res.BookCover,
-		PublishedAt: *res.PublishedAt,
+		Title:       res.Title,
+		Author:      res.Author,
+		BookCover:   res.BookCover,
+		PublishedAt: res.PublishedAt,
 	}
 	return body
 }
@@ -194,10 +203,10 @@ func NewAllResponseBody(res []*books.Book) AllResponseBody {
 func NewUpdateBookResponseBody(res *books.Book) *UpdateBookResponseBody {
 	body := &UpdateBookResponseBody{
 		ID:          res.ID,
-		Title:       *res.Title,
-		Author:      *res.Author,
-		BookCover:   *res.BookCover,
-		PublishedAt: *res.PublishedAt,
+		Title:       res.Title,
+		Author:      res.Author,
+		BookCover:   res.BookCover,
+		PublishedAt: res.PublishedAt,
 	}
 	return body
 }
@@ -207,10 +216,10 @@ func NewUpdateBookResponseBody(res *books.Book) *UpdateBookResponseBody {
 func NewGetBookResponseBody(res *books.Book) *GetBookResponseBody {
 	body := &GetBookResponseBody{
 		ID:          res.ID,
-		Title:       *res.Title,
-		Author:      *res.Author,
-		BookCover:   *res.BookCover,
-		PublishedAt: *res.PublishedAt,
+		Title:       res.Title,
+		Author:      res.Author,
+		BookCover:   res.BookCover,
+		PublishedAt: res.PublishedAt,
 	}
 	return body
 }
@@ -261,10 +270,10 @@ func NewUploadInternalErrorResponseBody(res *goa.ServiceError) *UploadInternalEr
 func NewCreateBook(body *CreateRequestBody) *books.Book {
 	v := &books.Book{
 		ID:          body.ID,
-		Title:       &*body.Title,
-		Author:      &*body.Author,
-		BookCover:   &*body.BookCover,
-		PublishedAt: &*body.PublishedAt,
+		Title:       *body.Title,
+		Author:      *body.Author,
+		BookCover:   *body.BookCover,
+		PublishedAt: *body.PublishedAt,
 	}
 
 	return v
@@ -306,6 +315,21 @@ func NewUploadPayload(dir string, contentType string) *books.UploadPayload {
 	return v
 }
 
+// NewUploadImagePayload builds a books service uploadImage endpoint payload.
+func NewUploadImagePayload(body *UploadImageRequestBody) *books.UploadImagePayload {
+	v := &books.UploadImagePayload{
+		Image: body.Image,
+	}
+	if body.ContentType != nil {
+		v.ContentType = *body.ContentType
+	}
+	if body.ContentType == nil {
+		v.ContentType = "multipart/form-data; boundary=goa"
+	}
+
+	return v
+}
+
 // ValidateCreateRequestBody runs the validations defined on CreateRequestBody
 func ValidateCreateRequestBody(body *CreateRequestBody) (err error) {
 	if body.Title == nil {
@@ -330,6 +354,15 @@ func ValidateUpdateBookRequestBody(body *UpdateBookRequestBody) (err error) {
 		if err2 := ValidateBookRequestBody(body.Book); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateUploadImageRequestBody runs the validations defined on
+// UploadImageRequestBody
+func ValidateUploadImageRequestBody(body *UploadImageRequestBody) (err error) {
+	if body.ContentType != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.content_type", *body.ContentType, "multipart/[^;]+; boundary=.+"))
 	}
 	return
 }
