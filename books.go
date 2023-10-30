@@ -171,8 +171,17 @@ func (s *bookssrvc) UpdateBook(ctx context.Context, p *books.UpdateBookPayload) 
 		return nil, err
 	}
 
+	// Fetch the updated book from the database
+	row := s.db.QueryRowContext(ctx, "SELECT * FROM books WHERE Id = ?", p.ID)
+
+	// Scan the row into a new Book struct
+	var updatedBook books.Book
+	if err := row.Scan(&updatedBook.ID, &updatedBook.Title, &updatedBook.Author, &updatedBook.BookCover, &updatedBook.PublishedAt); err != nil {
+		return nil, err
+	}
+
 	// Return the updated book
-	return p.Book, nil
+	return &updatedBook, nil
 }
 
 // GetBook implements getBook.
