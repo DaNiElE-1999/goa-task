@@ -11,6 +11,7 @@ require (
 require (
 	github.com/AnatolyRugalev/goregen v0.1.0 // indirect
 	github.com/ClickHouse/clickhouse-go v1.5.4 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230321174746-8dcc6526cfb1 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/bytecodealliance/wasmtime-go/v14 v14.0.0 // indirect

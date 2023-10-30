@@ -1,4 +1,3 @@
-
 # Setup the project
 
     After cloning the project:
@@ -19,7 +18,7 @@
 1. Open a shell session on the schema directory (.\\sql\schema\)
 2. Type: "goose mysql 'Connection_String' up"
 
-This will  migrate all the database tables.
+This will run all the migrations.
 
 # API
 
