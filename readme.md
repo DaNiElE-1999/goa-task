@@ -26,10 +26,10 @@ This will run all the migrations.
 Send a JSON POST request to  "/books" endpoint with the following key-values:
 
 '{
-      "author": "Sunt ut sint accusamus.",
-      "bookCover": "Omnis molestiae sed.",
+      "author": "Plato",
+      "bookCover": "TheRepublicCover.png",
       "publishedAt": "yyyy-mm-dd",
-      "title": "Ipsam sed."
+      "title": "The Republic"
    }'
 
 - ###### All
@@ -42,10 +42,10 @@ Send a JSON PUT request to  "/books/{id}" endpoint with the following key-values
 
 {
   "book": {
-      "author": "Sunt ut sint accusamus.",
-      "bookCover": "Omnis molestiae sed.",
+      "author": "Machiaveli",
+      "bookCover": "ThePrince.jpg",
       "publishedAt": "yyyy-mm-dd",
-      "title": "Ipsam sed."
+      "title": "The Prince"
   }
 }
 
