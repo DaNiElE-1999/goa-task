@@ -19,6 +19,11 @@
 
 This will run all the migrations.
 
+# Run The Project
+
+1. Run: "go build ./cmd/books && go build ./cmd/books-cli" -> to build the project
+2. Run: "./books" -> to build the executables
+
 # API
 
 - ###### Create
