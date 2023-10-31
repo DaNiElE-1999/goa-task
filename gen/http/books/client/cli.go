@@ -12,8 +12,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-
-	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildCreatePayload builds the payload for the books create endpoint from CLI
@@ -105,31 +103,6 @@ func BuildDeleteBookPayload(booksDeleteBookID string) (*books.DeleteBookPayload,
 	return v, nil
 }
 
-// BuildUploadPayload builds the payload for the books upload endpoint from CLI
-// flags.
-func BuildUploadPayload(booksUploadDir string, booksUploadContentType string) (*books.UploadPayload, error) {
-	var err error
-	var dir string
-	{
-		dir = booksUploadDir
-	}
-	var contentType string
-	{
-		if booksUploadContentType != "" {
-			contentType = booksUploadContentType
-			err = goa.MergeErrors(err, goa.ValidatePattern("content_type", contentType, "multipart/[^;]+; boundary=.+"))
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	v := &books.UploadPayload{}
-	v.Dir = dir
-	v.ContentType = contentType
-
-	return v, nil
-}
-
 // BuildUploadImagePayload builds the payload for the books uploadImage
 // endpoint from CLI flags.
 func BuildUploadImagePayload(booksUploadImageBody string) (*books.UploadImagePayload, error) {
@@ -138,7 +111,7 @@ func BuildUploadImagePayload(booksUploadImageBody string) (*books.UploadImagePay
 	{
 		err = json.Unmarshal([]byte(booksUploadImageBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"content_type\": \"multipart/\U000c737d鰒𩴿; boundary=�����\",\n      \"image\": \"RXQgc2ludCBjb25zZXF1dW50dXIgdXQgYWxpYXMgZW9zLg==\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"content_type\": \"multipart/\U001040e9\U0010edf4\U0006a690\U000996aa\U000b628a; boundary=�\",\n      \"image\": \"TW9sZXN0aWFzIGVzdC4=\"\n   }'")
 		}
 	}
 	v := &books.UploadImagePayload{

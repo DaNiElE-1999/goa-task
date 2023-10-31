@@ -69,27 +69,6 @@ func (s *bookssrvc) executeQuery(query string, args ...interface{}) error {
 	return err
 }
 
-// UploadImage implements the upload image functionality
-func (s *bookssrvc) UploadImage(ctx context.Context, p *books.UploadImagePayload) (err error) {
-	// Generate a unique filename for the image
-	filename := filepath.Join("public/images", fmt.Sprintf("%d.png", time.Now().UnixNano()))
-
-	// Create a new file in the images directory
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Write the image data to the file
-	_, err = io.Copy(file, bytes.NewReader(p.Image))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Create implements create.
 func (s *bookssrvc) Create(ctx context.Context, p *books.Book) (res *books.Book, err error) {
 	s.logger.Print("books.create")
@@ -237,7 +216,28 @@ func (s *bookssrvc) DeleteBook(ctx context.Context, p *books.DeleteBookPayload) 
 	return nil
 }
 
-// Upload implements upload.
-func (s *bookssrvc) Upload(ctx context.Context, p *books.UploadPayload, req io.ReadCloser) error {
+// UploadImage implements the upload image functionality
+func (s *bookssrvc) UploadImage(ctx context.Context, p *books.UploadImagePayload) (err error) {
+	// Check if p or p.Image is nil
+	if p == nil || p.Image == nil {
+		return errors.New("payload or image is nil")
+	}
+
+	// Generate a unique filename for the image
+	filename := filepath.Join("public/images", fmt.Sprintf("%d.png", time.Now().UnixNano()))
+
+	// Create a new file in the images directory
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Write the image data to the file
+	_, err = io.Copy(file, bytes.NewReader(p.Image))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

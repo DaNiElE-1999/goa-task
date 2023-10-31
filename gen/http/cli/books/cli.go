@@ -22,7 +22,7 @@ import (
 //
 //	command (subcommand1|subcommand2|...)
 func UsageCommands() string {
-	return `books (create|all|update-book|get-book|delete-book|upload|upload-image)
+	return `books (create|all|update-book|get-book|delete-book|upload-image)
 `
 }
 
@@ -66,11 +66,6 @@ func ParseEndpoint(
 		booksDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
 		booksDeleteBookIDFlag = booksDeleteBookFlags.String("id", "REQUIRED", "Book ID")
 
-		booksUploadFlags           = flag.NewFlagSet("upload", flag.ExitOnError)
-		booksUploadDirFlag         = booksUploadFlags.String("dir", "REQUIRED", "Dir is the relative path to the file directory where the uploaded content is saved.")
-		booksUploadContentTypeFlag = booksUploadFlags.String("content-type", "multipart/form-data; boundary=goa", "")
-		booksUploadStreamFlag      = booksUploadFlags.String("stream", "REQUIRED", "path to file containing the streamed request body")
-
 		booksUploadImageFlags    = flag.NewFlagSet("upload-image", flag.ExitOnError)
 		booksUploadImageBodyFlag = booksUploadImageFlags.String("body", "REQUIRED", "")
 	)
@@ -80,7 +75,6 @@ func ParseEndpoint(
 	booksUpdateBookFlags.Usage = booksUpdateBookUsage
 	booksGetBookFlags.Usage = booksGetBookUsage
 	booksDeleteBookFlags.Usage = booksDeleteBookUsage
-	booksUploadFlags.Usage = booksUploadUsage
 	booksUploadImageFlags.Usage = booksUploadImageUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
@@ -132,9 +126,6 @@ func ParseEndpoint(
 			case "delete-book":
 				epf = booksDeleteBookFlags
 
-			case "upload":
-				epf = booksUploadFlags
-
 			case "upload-image":
 				epf = booksUploadImageFlags
 
@@ -178,12 +169,6 @@ func ParseEndpoint(
 			case "delete-book":
 				endpoint = c.DeleteBook()
 				data, err = booksc.BuildDeleteBookPayload(*booksDeleteBookIDFlag)
-			case "upload":
-				endpoint = c.Upload()
-				data, err = booksc.BuildUploadPayload(*booksUploadDirFlag, *booksUploadContentTypeFlag)
-				if err == nil {
-					data, err = booksc.BuildUploadStreamPayload(data, *booksUploadStreamFlag)
-				}
 			case "upload-image":
 				endpoint = c.UploadImage(booksUploadImageEncoderFn)
 				data, err = booksc.BuildUploadImagePayload(*booksUploadImageBodyFlag)
@@ -209,7 +194,6 @@ COMMAND:
     update-book: UpdateBook implements updateBook.
     get-book: GetBook implements getBook.
     delete-book: DeleteBook implements deleteBook.
-    upload: Upload implements upload.
     upload-image: Upload an image
 
 Additional help:
@@ -285,19 +269,6 @@ Example:
 `, os.Args[0])
 }
 
-func booksUploadUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] books upload -dir STRING -content-type STRING -stream STRING
-
-Upload implements upload.
-    -dir STRING: Dir is the relative path to the file directory where the uploaded content is saved.
-    -content-type STRING: 
-    -stream STRING: path to file containing the streamed request body
-
-Example:
-    %[1]s books upload --dir "upload" --content-type "multipart/form-data; boundary=goa" --stream "goa.png"
-`, os.Args[0])
-}
-
 func booksUploadImageUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] books upload-image -body JSON
 
@@ -306,8 +277,8 @@ Upload an image
 
 Example:
     %[1]s books upload-image --body '{
-      "content_type": "multipart/󇍽鰒𩴿; boundary=�����",
-      "image": "RXQgc2ludCBjb25zZXF1dW50dXIgdXQgYWxpYXMgZW9zLg=="
+      "content_type": "multipart/􄃩􎷴񪚐򙚪򶊊; boundary=�",
+      "image": "TW9sZXN0aWFzIGVzdC4="
    }'
 `, os.Args[0])
 }

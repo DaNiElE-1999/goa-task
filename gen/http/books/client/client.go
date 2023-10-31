@@ -37,9 +37,6 @@ type Client struct {
 	// endpoint.
 	DeleteBookDoer goahttp.Doer
 
-	// Upload Doer is the HTTP client used to make requests to the upload endpoint.
-	UploadDoer goahttp.Doer
-
 	// UploadImage Doer is the HTTP client used to make requests to the uploadImage
 	// endpoint.
 	UploadImageDoer goahttp.Doer
@@ -73,7 +70,6 @@ func NewClient(
 		UpdateBookDoer:      doer,
 		GetBookDoer:         doer,
 		DeleteBookDoer:      doer,
-		UploadDoer:          doer,
 		UploadImageDoer:     doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -183,30 +179,6 @@ func (c *Client) DeleteBook() goa.Endpoint {
 		resp, err := c.DeleteBookDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("books", "deleteBook", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// Upload returns an endpoint that makes HTTP requests to the books service
-// upload server.
-func (c *Client) Upload() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeUploadRequest(c.encoder)
-		decodeResponse = DecodeUploadResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v any) (any, error) {
-		req, err := c.BuildUploadRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.UploadDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("books", "upload", err)
 		}
 		return decodeResponse(resp)
 	}
