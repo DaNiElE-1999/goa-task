@@ -239,5 +239,12 @@ func (s *bookssrvc) UploadImage(ctx context.Context, p *books.UploadImagePayload
 		return err
 	}
 
+	// Insert the image path into the bookCovers table
+	// Foreign key would have to be implemented
+	_, err = s.db.ExecContext(ctx, "INSERT INTO bookCovers (Path, BookId) VALUES (?, ?)", filename, nil)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

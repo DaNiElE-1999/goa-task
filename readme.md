@@ -6,10 +6,9 @@
 2. Install the latest goa framework
 
    go install goa.design/goa/v3/cmd/goa@v3
-3. Install protoc using the documentation, according to your OS distribution
-4. Install sqlc using the documentation, according to your OS distribution
-5. Install goose using the documentation, according to your OS distribution
-6. Install all the rest of packages:
+3. Install sqlc using the documentation, according to your OS distribution
+4. Install goose using the documentation, according to your OS distribution
+5. Install all the rest of packages:
 
    go get ./...
 
@@ -66,6 +65,7 @@ Send a POST request to  "/uploadBookCover" endpoint with the following key-value
 
 image: "The actual image"
 
+content_type: "multipart/form-data; boundary=goa"
 
 # Note
 

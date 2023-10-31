@@ -175,17 +175,13 @@ func TestGetBook(t *testing.T) {
 
 	// Define the input and output for the test case
 	id := 13
-	title := "A Game of Thrones"
-	author := "George R. R. Martin"
-	bookCover := "https://www.example.com/a_game_of_thrones.jpg"
-	publishedAt := "1996-08-01"
 
 	expectedOutput := &books.Book{
 		ID:          &id,
-		Title:       title,
-		Author:      author,
-		BookCover:   bookCover,
-		PublishedAt: publishedAt,
+		Title:       testBook.Title,
+		Author:      testBook.Author,
+		BookCover:   testBook.BookCover,
+		PublishedAt: testBook.PublishedAt,
 	}
 
 	// Set up the mock database to expect the select query
