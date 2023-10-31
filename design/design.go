@@ -34,15 +34,25 @@ var _ = Service("books", func() {
 	Method("create", func() {
 		Payload(Book)
 		Result(Book)
+		Error("bad_request", func() {
+			Description("The request is invalid")
+		})
 		HTTP(func() {
 			POST("/books")
+			Response(StatusOK)
+			Response("bad_request", StatusBadRequest)
 		})
 	})
 
 	Method("all", func() {
 		Result(ArrayOf(Book))
+		Error("not_found", func() {
+			Description("Books not found")
+		})
 		HTTP(func() {
 			GET("/books")
+			Response(StatusOK)
+			Response("not_found", StatusNotFound)
 		})
 	})
 
@@ -52,8 +62,13 @@ var _ = Service("books", func() {
 			Field(2, "book", Book)
 		})
 		Result(Book)
+		Error("bad_request", func() {
+			Description("The request is invalid")
+		})
 		HTTP(func() {
 			PUT("/books/{id}")
+			Response(StatusOK)
+			Response("bad_request", StatusBadRequest)
 		})
 	})
 
@@ -62,8 +77,13 @@ var _ = Service("books", func() {
 			Field(1, "id", Int, "Book ID")
 		})
 		Result(Book)
+		Error("not_found", func() {
+			Description("Book not found")
+		})
 		HTTP(func() {
 			GET("/books/{id}")
+			Response(StatusOK)
+			Response("not_found", StatusNotFound)
 		})
 	})
 
@@ -71,8 +91,13 @@ var _ = Service("books", func() {
 		Payload(func() {
 			Field(1, "id", Int, "Book ID")
 		})
+		Error("not_found", func() {
+			Description("Book not found")
+		})
 		HTTP(func() {
 			DELETE("/books/{id}")
+			Response(StatusNoContent)
+			Response("not_found", StatusNotFound)
 		})
 	})
 
@@ -85,12 +110,16 @@ var _ = Service("books", func() {
 				Pattern("multipart/[^;]+; boundary=.+")
 			})
 		})
+		Error("bad_request", func() {
+			Description("The request is invalid")
+		})
 		HTTP(func() {
 			POST("/uploadBookCover")
 			MultipartRequest()
 			Response(StatusOK)
+			Response("bad_request", StatusBadRequest)
 		})
 	})
 
 	Files("/openapi3.json", "./gen/http/openapi3.json")
-}) //error handling to be implemented
+})

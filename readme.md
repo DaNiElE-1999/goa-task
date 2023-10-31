@@ -62,7 +62,10 @@ Send a DELETE request to "/books/{id}" endpoint, to delete the book with that ID
 
 - ###### Upload
 
-ToBeImplemented
+Send a POST request to  "/uploadBookCover" endpoint with the following key-values:
+
+image: "The actual image"
+
 
 # Note
 
