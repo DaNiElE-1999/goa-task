@@ -33,7 +33,6 @@ func isValidDateFormat(date string) bool {
 type bookssrvc struct {
 	logger *log.Logger
 	db     *sql.DB
-	dir    string // Path to download and upload directory
 }
 
 // NewBooks returns the books service implementation.
